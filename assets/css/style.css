@@ -1572,6 +1572,8 @@ section[id]{scroll-margin-top:150px}
 /* Calculator page (added) */
 .calc-hero{padding-bottom:clamp(120px,15vw,180px)}
 .calc-hero .lead{color:#C7D1EC}
+.calc-hero-chart{inset:0;width:100%;height:100%;opacity:.9}
+@media (max-width:760px){.calc-hero-chart{opacity:.55}}
 .calc-section{background:var(--canvas);padding:0 0 clamp(64px,8vw,104px)}
 .calc-section>.container{max-width:1000px}
 .calc-section .sip-wrap{max-width:860px;margin:clamp(-150px,-15vw,-110px) auto 0;position:relative;z-index:3}
