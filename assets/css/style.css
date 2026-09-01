@@ -1610,3 +1610,14 @@ section[id]{scroll-margin-top:150px}
 .lim-card h3{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:8px}
 .lim-card p{font-size:13.8px;line-height:1.6;color:var(--slate)}
 @media (max-width:640px){.feat-grid-2{grid-template-columns:1fr}}
+
+/* Homepage hero + card artwork (added) */
+.hero-bg{z-index:0;opacity:.92}
+.svc-shade{background:
+  radial-gradient(150px 150px at 100% 0%,rgba(123,191,167,.16),transparent 68%),
+  linear-gradient(184deg,rgba(12,20,47,.12) 0%,rgba(12,20,47,.4) 38%,rgba(9,15,38,.9) 100%)}
+.svc-featured .svc-shade{background:
+  radial-gradient(160px 160px at 100% 0%,rgba(123,191,167,.2),transparent 68%),
+  linear-gradient(184deg,rgba(18,32,74,.14) 0%,rgba(15,26,58,.42) 38%,rgba(11,20,44,.9) 100%)}
+.svc-card:hover .svc-shade{filter:brightness(1.06)}
+@media (max-width:760px){.hero-bg{opacity:.6}}
