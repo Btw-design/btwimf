@@ -104,6 +104,76 @@
     });
   });
 
+  /* ── Shared form submission helper ────────────────
+     Every form POSTs to the PHP handler, which stores the lead and emails
+     the office. Success UI is shown ONLY after {ok:true}; failures show an
+     inline error and leave the form editable. */
+  window.__formTs = Date.now();
+  var FORM_ENDPOINT = '/form-handler.php';
+
+  /* Honeypot: injected (not in HTML) so it never reaches real users but
+     naive bots that fill every field get caught server-side. */
+  Array.prototype.forEach.call(
+    document.querySelectorAll('.contact-form,.careers-form,.pcf,.claim-form,.renew-form,.qb-form'),
+    function (fm) {
+      if (fm.querySelector('input[name="_hp"]')) return;
+      var hp = document.createElement('input');
+      hp.type = 'text'; hp.name = '_hp'; hp.tabIndex = -1;
+      hp.setAttribute('autocomplete', 'off'); hp.setAttribute('aria-hidden', 'true');
+      hp.style.cssText = 'position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0;pointer-events:none';
+      fm.appendChild(hp);
+    }
+  );
+
+  function setLoading(btn, on) {
+    if (!btn) return;
+    if (on) { btn.setAttribute('data-loading', '1'); btn.setAttribute('aria-busy', 'true'); btn.disabled = true; }
+    else { btn.removeAttribute('data-loading'); btn.removeAttribute('aria-busy'); btn.disabled = false; }
+  }
+  function showFormError(form, msg) {
+    var e = form.querySelector(':scope > .form-error') || form.querySelector('.form-error');
+    if (!e) {
+      e = document.createElement('div');
+      e.className = 'form-error';
+      e.setAttribute('role', 'alert');
+      e.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 4.3 3 17a2 2 0 0 0 1.7 3h14.6a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z"/></svg><span></span>';
+      var sb = form.querySelector('[type="submit"]');
+      if (sb && sb.parentNode === form) form.insertBefore(e, sb.nextSibling);
+      else form.appendChild(e);
+    }
+    e.querySelector('span').textContent = msg;
+  }
+  function sendForm(form, btn, type, extra, onSuccess) {
+    var fd;
+    try { fd = new FormData(form); } catch (err) { fd = new FormData(); }
+    fd.append('_form', type);
+    fd.append('_ts', String(window.__formTs));
+    fd.append('_page', location.href);
+    if (extra) Object.keys(extra).forEach(function (k) { fd.set(k, extra[k]); });
+    var old = form.querySelector('.form-error'); if (old) old.parentNode.removeChild(old);
+    form.classList.add('is-submitting');
+    setLoading(btn, true);
+    fetch(FORM_ENDPOINT, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'fetch' } })
+      .then(function (r) {
+        return r.text().then(function (t) {
+          var j = {}; try { j = JSON.parse(t); } catch (e) {}
+          return { ok: r.ok, j: j };
+        });
+      })
+      .then(function (res) {
+        form.classList.remove('is-submitting');
+        setLoading(btn, false);
+        if (res.j && res.j.ok === true) { onSuccess(); }
+        else { showFormError(form, (res.j && res.j.error) || 'We could not send your request just now. Please try again, or call / WhatsApp us on 90043 83987.'); }
+      })
+      .catch(function () {
+        form.classList.remove('is-submitting');
+        setLoading(btn, false);
+        showFormError(form, 'Network error — please check your connection and try again, or call us on 022 6930 2820.');
+      });
+  }
+
+  /* ── Quote bar: phone form ────────────────────── */
   var qbForm = document.querySelector('.qb-form');
   if (qbForm) {
     qbForm.addEventListener('submit', function (e) {
@@ -118,12 +188,14 @@
       var need = 'your needs';
       var active = document.querySelector('.qb-pills .pill.is-active');
       if (active) need = active.textContent.trim().toLowerCase();
-      var ok = document.createElement('div');
-      ok.className = 'qb-success';
-      ok.innerHTML =
-        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>' +
-        '<span>Thank you! An advisor will call you about <strong>&nbsp;' + need + '&nbsp;</strong> within working hours.</span>';
-      qbForm.parentNode.replaceChild(ok, qbForm);
+      sendForm(qbForm, qbForm.querySelector('[type="submit"]'), 'quick-quote', { interest: need }, function () {
+        var ok = document.createElement('div');
+        ok.className = 'qb-success';
+        ok.innerHTML =
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>' +
+          '<span>Thank you! An advisor will call you about <strong>&nbsp;' + need + '&nbsp;</strong> within working hours.</span>';
+        qbForm.parentNode.replaceChild(ok, qbForm);
+      });
     });
   }
 
@@ -147,10 +219,32 @@
         vehInput.focus();
         return;
       }
-      if (vehMsg) {
-        vehMsg.textContent = 'Found it! An advisor will call with renewal quotes for ' + v + ' shortly.';
-        vehMsg.className = 'qbv-msg show ok';
-      }
+      var btn = vehForm.querySelector('[type="submit"]');
+      setLoading(btn, true);
+      if (vehMsg) { vehMsg.textContent = 'Checking…'; vehMsg.className = 'qbv-msg show'; }
+      var fd = new FormData();
+      fd.append('_form', 'vehicle-lookup');
+      fd.append('_ts', String(window.__formTs));
+      fd.append('_page', location.href);
+      fd.append('vehreg', v);
+      fetch(FORM_ENDPOINT, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'fetch' } })
+        .then(function (r) { return r.text().then(function (t) { var j = {}; try { j = JSON.parse(t); } catch (e) {} return j; }); })
+        .then(function (j) {
+          setLoading(btn, false);
+          if (j && j.ok) {
+            if (vehMsg) {
+              vehMsg.innerHTML = 'Noted <strong>' + v + '</strong>. Share your mobile number in the form above or ' +
+                '<a href="https://wa.me/919004383987?text=Renewal%20quote%20for%20' + encodeURIComponent(v) + '" target="_blank" rel="noopener">message us on WhatsApp</a> and an advisor will send renewal quotes.';
+              vehMsg.className = 'qbv-msg show ok';
+            }
+          } else {
+            if (vehMsg) { vehMsg.textContent = (j && j.error) || 'Could not submit just now — please WhatsApp us on 90043 83987.'; vehMsg.className = 'qbv-msg show err'; }
+          }
+        })
+        .catch(function () {
+          setLoading(btn, false);
+          if (vehMsg) { vehMsg.textContent = 'Network error — please try again or WhatsApp us on 90043 83987.'; vehMsg.className = 'qbv-msg show err'; }
+        });
     });
   }
 
@@ -384,18 +478,20 @@
       if (!topic.value) { topic.classList.add('is-invalid'); bad = bad || topic; }
       if (bad) { bad.focus(); return; }
 
-      var card = cForm.closest('.contact-card');
-      var first = (name.value.trim().split(/\s+/)[0]) || 'there';
-      var done = document.createElement('div');
-      done.className = 'form-done';
-      done.setAttribute('role', 'status');
-      done.innerHTML =
-        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>' +
-        '<div><b>Thanks, ' + first + ' — message received.</b>' +
-        '<p>One of our advisors will get back to you on ' + email.value.trim() +
-        ' or ' + phone.value.trim() + ' within working hours (Mon&ndash;Sat, 10&nbsp;am&nbsp;&ndash;&nbsp;7&nbsp;pm).</p></div>';
-      cForm.replaceWith(done);
-      if (card) { var h = card.querySelector('h2'); if (h) h.textContent = 'Message sent'; }
+      sendForm(cForm, cForm.querySelector('[type="submit"]'), 'contact', null, function () {
+        var card = cForm.closest('.contact-card');
+        var first = (name.value.trim().split(/\s+/)[0]) || 'there';
+        var done = document.createElement('div');
+        done.className = 'form-done';
+        done.setAttribute('role', 'status');
+        done.innerHTML =
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>' +
+          '<div><b>Thanks, ' + first + ' — message received.</b>' +
+          '<p>One of our advisors will get back to you on ' + email.value.trim() +
+          ' or ' + phone.value.trim() + ' within working hours (Mon&ndash;Sat, 10&nbsp;am&nbsp;&ndash;&nbsp;7&nbsp;pm).</p></div>';
+        cForm.replaceWith(done);
+        if (card) { var h = card.querySelector('h2'); if (h) h.textContent = 'Message sent'; }
+      });
     });
   }
 
@@ -425,22 +521,24 @@
       if (!f.role.value) { f.role.classList.add('is-invalid'); bad = bad || f.role; }
       if (bad) { bad.focus(); return; }
 
-      var resume = jForm.querySelector('#jf-resume');
-      var fileName = resume && resume.files && resume.files[0] ? resume.files[0].name : '';
-      var card = jForm.closest('.contact-card');
-      var first = (f.name.value.trim().split(/\s+/)[0]) || 'there';
-      var done = document.createElement('div');
-      done.className = 'form-done';
-      done.setAttribute('role', 'status');
-      done.innerHTML =
-        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>' +
-        '<div><b>Thanks, ' + first + ' — application received.</b>' +
-        '<p>We&rsquo;ve logged your interest in the <strong>' + f.role.value + '</strong> role' +
-        (fileName ? ' along with <strong>' + fileName + '</strong>' : '') +
-        '. If there&rsquo;s a fit, our team will contact you on ' + f.email.value.trim() +
-        ' within 5&ndash;7 working days.</p></div>';
-      jForm.replaceWith(done);
-      if (card) { var h = card.querySelector('h2'); if (h) h.textContent = 'Application received'; }
+      sendForm(jForm, jForm.querySelector('[type="submit"]'), 'careers', null, function () {
+        var resume = jForm.querySelector('#jf-resume');
+        var fileName = resume && resume.files && resume.files[0] ? resume.files[0].name : '';
+        var card = jForm.closest('.contact-card');
+        var first = (f.name.value.trim().split(/\s+/)[0]) || 'there';
+        var done = document.createElement('div');
+        done.className = 'form-done';
+        done.setAttribute('role', 'status');
+        done.innerHTML =
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>' +
+          '<div><b>Thanks, ' + first + ' — application received.</b>' +
+          '<p>We&rsquo;ve logged your interest in the <strong>' + f.role.value + '</strong> role' +
+          (fileName ? ' along with <strong>' + fileName + '</strong>' : '') +
+          '. If there&rsquo;s a fit, our team will contact you on ' + f.email.value.trim() +
+          ' within 5&ndash;7 working days.</p></div>';
+        jForm.replaceWith(done);
+        if (card) { var h = card.querySelector('h2'); if (h) h.textContent = 'Application received'; }
+      });
     });
   }
 
@@ -463,18 +561,20 @@
       if (bad) { bad.focus(); return; }
 
       var product = pForm.getAttribute('data-product') || 'your cover';
-      var card = pForm.closest('.contact-card');
-      var first = (n.value.trim().split(/\s+/)[0]) || 'there';
-      var done = document.createElement('div');
-      done.className = 'form-done';
-      done.setAttribute('role', 'status');
-      done.innerHTML =
-        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>' +
-        '<div><b>Thanks, ' + first + ' — request received.</b>' +
-        '<p>A licensed BTW IMF advisor will call you about <strong>' + product +
-        '</strong> on ' + ph.value.trim() + ' within working hours (Mon&ndash;Sat, 10&nbsp;am&ndash;7&nbsp;pm).</p></div>';
-      pForm.replaceWith(done);
-      if (card) { var h = card.querySelector('h2'); if (h) h.textContent = 'Request received'; }
+      sendForm(pForm, pForm.querySelector('[type="submit"]'), 'product-quote', { product: product }, function () {
+        var card = pForm.closest('.contact-card');
+        var first = (n.value.trim().split(/\s+/)[0]) || 'there';
+        var done = document.createElement('div');
+        done.className = 'form-done';
+        done.setAttribute('role', 'status');
+        done.innerHTML =
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>' +
+          '<div><b>Thanks, ' + first + ' — request received.</b>' +
+          '<p>A licensed BTW IMF advisor will call you about <strong>' + product +
+          '</strong> on ' + ph.value.trim() + ' within working hours (Mon&ndash;Sat, 10&nbsp;am&ndash;7&nbsp;pm).</p></div>';
+        pForm.replaceWith(done);
+        if (card) { var h = card.querySelector('h2'); if (h) h.textContent = 'Request received'; }
+      });
     });
   }
 
@@ -499,19 +599,21 @@
       if (!ty.value) { ty.classList.add('is-invalid'); bad = bad || ty; }
       if (bad) { bad.focus(); return; }
 
-      var card = clForm.closest('.contact-card');
-      var first = (n.value.trim().split(/\s+/)[0]) || 'there';
-      var done = document.createElement('div');
-      done.className = 'form-done';
-      done.setAttribute('role', 'status');
-      done.innerHTML =
-        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>' +
-        '<div><b>Thanks, ' + first + ' — we’ve got it.</b>' +
-        '<p>A BTW IMF claim manager will call you on ' + ph.value.trim() +
-        ' about your <strong>' + ty.value + '</strong> claim within working hours (Mon&ndash;Sat, 10&nbsp;am&ndash;7&nbsp;pm). ' +
-        'For an emergency, call 022 45260 380 now.</p></div>';
-      clForm.replaceWith(done);
-      if (card) { var h = card.querySelector('h2'); if (h) h.textContent = 'Request received'; }
+      sendForm(clForm, clForm.querySelector('[type="submit"]'), 'claim', null, function () {
+        var card = clForm.closest('.contact-card');
+        var first = (n.value.trim().split(/\s+/)[0]) || 'there';
+        var done = document.createElement('div');
+        done.className = 'form-done';
+        done.setAttribute('role', 'status');
+        done.innerHTML =
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>' +
+          '<div><b>Thanks, ' + first + ' — we’ve got it.</b>' +
+          '<p>A BTW IMF claim manager will call you on ' + ph.value.trim() +
+          ' about your <strong>' + ty.value + '</strong> claim within working hours (Mon&ndash;Sat, 10&nbsp;am&ndash;7&nbsp;pm). ' +
+          'For an emergency, call 022 45260 380 now.</p></div>';
+        clForm.replaceWith(done);
+        if (card) { var h = card.querySelector('h2'); if (h) h.textContent = 'Request received'; }
+      });
     });
   }
 
@@ -536,19 +638,21 @@
       if (!ty.value) { ty.classList.add('is-invalid'); bad = bad || ty; }
       if (bad) { bad.focus(); return; }
 
-      var card = rnForm.closest('.contact-card');
-      var first = (n.value.trim().split(/\s+/)[0]) || 'there';
-      var done = document.createElement('div');
-      done.className = 'form-done';
-      done.setAttribute('role', 'status');
-      done.innerHTML =
-        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>' +
-        '<div><b>Thanks, ' + first + ' — noted.</b>' +
-        '<p>A BTW IMF advisor will call you on ' + ph.value.trim() +
-        ' about renewing your <strong>' + ty.value + '</strong> policy, with the options, before it expires ' +
-        '(we work Mon&ndash;Sat, 10&nbsp;am&ndash;7&nbsp;pm).</p></div>';
-      rnForm.replaceWith(done);
-      if (card) { var h = card.querySelector('h2'); if (h) h.textContent = 'Request received'; }
+      sendForm(rnForm, rnForm.querySelector('[type="submit"]'), 'renewal', null, function () {
+        var card = rnForm.closest('.contact-card');
+        var first = (n.value.trim().split(/\s+/)[0]) || 'there';
+        var done = document.createElement('div');
+        done.className = 'form-done';
+        done.setAttribute('role', 'status');
+        done.innerHTML =
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>' +
+          '<div><b>Thanks, ' + first + ' — noted.</b>' +
+          '<p>A BTW IMF advisor will call you on ' + ph.value.trim() +
+          ' about renewing your <strong>' + ty.value + '</strong> policy, with the options, before it expires ' +
+          '(we work Mon&ndash;Sat, 10&nbsp;am&ndash;7&nbsp;pm).</p></div>';
+        rnForm.replaceWith(done);
+        if (card) { var h = card.querySelector('h2'); if (h) h.textContent = 'Request received'; }
+      });
     });
   }
 

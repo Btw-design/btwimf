@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Internal / non-content paths
+Disallow: /_submissions/
+Disallow: /form-handler.php
+
+Sitemap: https://btwimf.com/sitemap.xml

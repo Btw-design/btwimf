@@ -5,3 +5,6 @@ Thumbs.db
 
 # Claude Code local tooling
 .claude/
+
+# Runtime: stored form submissions (created by form-handler.php on the server)
+_submissions/
