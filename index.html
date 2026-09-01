@@ -813,23 +813,64 @@
 </section>
 
 <!-- ══════════ Final CTA ══════════ -->
-<section class="cta-final" id="contact">
+<section class="cta-final contact-final" id="contact">
   <svg class="deco cta-rings" width="640" height="640" viewBox="0 0 640 640" aria-hidden="true" focusable="false">
     <circle cx="320" cy="320" r="318" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1.5"/>
     <circle cx="320" cy="320" r="238" fill="none" stroke="rgba(123,191,167,.16)" stroke-width="1.5"/>
     <circle cx="320" cy="320" r="158" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="1.5"/>
   </svg>
-  <div class="container cta-inner">
-    <span class="kicker kicker-light rv">Begin today</span>
-    <h2 class="serif rv">Let&rsquo;s build a more secure<br>financial future.</h2>
-    <p class="rv">Talk to a licensed advisor who compares the whole market — and stays with you long after the purchase. Consultations are free, at our office or your doorstep.</p>
-    <div class="cta-btns rv">
-      <a class="btn btn-accent btn-lg" href="https://wa.me/919004383987?text=Hi%20BTW%20IMF%2C%20I%27d%20like%20a%20free%20consultation." target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 012.41 5.83c0 4.54-3.7 8.23-8.23 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.16-.48-.27z"/></svg>
-        Talk to an Expert</a>
-      <a class="btn btn-outline-light btn-lg" href="#quote">Get a Quote</a>
+  <div class="container cf-grid">
+    <div class="cf-copy">
+      <span class="kicker kicker-light rv">Get in touch</span>
+      <h2 class="serif rv">Let&rsquo;s build a more secure<br>financial future.</h2>
+      <p class="rv">Tell us what you need. A licensed advisor who compares the whole market will get back to you &mdash; usually the same working day. Free, and with no obligation.</p>
+      <ul class="cf-points rv">
+        <li><span class="tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg></span>IRDAI-licensed advice across 15+ insurers</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg></span>Real help at claim time &mdash; from first call to payout</li>
+        <li><span class="tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg></span>At our office, your home, or online</li>
+      </ul>
+      <p class="cf-meta rv">Mon&ndash;Sat &middot; 10&nbsp;am&nbsp;&ndash;&nbsp;7&nbsp;pm &nbsp;&middot;&nbsp; <a href="tel:+912269302820">022 6930 2820</a> &nbsp;&middot;&nbsp; <a href="mailto:info@btwimf.com">info@btwimf.com</a></p>
     </div>
-    <p class="cta-meta rv">Mon–Sat · 10 am – 7 pm &nbsp;·&nbsp; Mumbai &amp; Pune &nbsp;·&nbsp; <a href="tel:+912269302820">022 6930 2820</a></p>
+
+    <div class="contact-card rv" id="contact-form">
+      <h2>Send us a message</h2>
+      <p>Fields marked <span aria-hidden="true">*</span> are required &mdash; we&rsquo;ll reply within working hours.</p>
+      <form class="contact-form" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="cf-name">Full name <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="cf-name" name="name" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="cf-phone">Mobile number <span class="req" aria-hidden="true">*</span></label>
+            <input type="tel" id="cf-phone" name="phone" inputmode="tel" autocomplete="tel" maxlength="14" required>
+          </div>
+          <div class="field full">
+            <label for="cf-email">Email address <span class="req" aria-hidden="true">*</span></label>
+            <input type="email" id="cf-email" name="email" autocomplete="email" required>
+          </div>
+          <div class="field full">
+            <label for="cf-topic">I need <span class="req" aria-hidden="true">*</span></label>
+            <select id="cf-topic" name="topic" required>
+              <option value="">Select advice</option>
+              <option>Insurance advice</option>
+              <option>Financial &amp; investment advice</option>
+              <option>Claim support</option>
+              <option>Policy renewal</option>
+              <option>Become a partner</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="cf-msg">Your message</label>
+            <textarea id="cf-msg" name="message" placeholder="Tell us a little about what you&rsquo;re looking for…"></textarea>
+          </div>
+        </div>
+        <button class="btn btn-navy btn-lg" type="submit">Submit
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <p class="form-note">By submitting, you agree that the information provided may be shared with insurers to service your request. Insurance is the subject matter of solicitation.</p>
+      </form>
+    </div>
   </div>
 </section>
 
@@ -959,6 +1000,10 @@
 </footer>
 
 <!-- Mobile sticky action bar -->
+<a class="wa-fab" href="https://wa.me/919004383987?text=Hi%20BTW%20IMF%2C%20I%27d%20like%20to%20get%20in%20touch." target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 012.41 5.83c0 4.54-3.7 8.23-8.23 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.16-.48-.27z"/></svg>
+</a>
+
 <div class="mobilebar" aria-label="Quick actions">
   <a href="tel:+912269302820"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l1.5 4.5L8 10a12 12 0 006 6l1.5-2.5L20 15v4a2 2 0 01-2 2A15 15 0 013 6a2 2 0 012-2z"/></svg>Call</a>
   <a class="mb-wa" href="https://wa.me/919004383987?text=Hi%20BTW%20IMF%2C%20I%27d%20like%20a%20free%20consultation." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 012.41 5.83c0 4.54-3.7 8.23-8.23 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.16-.48-.27z"/></svg>WhatsApp</a>
