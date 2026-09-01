@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIP Calculator — Project Your Mutual Fund Investment Growth | BTW IMF</title>
+<meta name="description" content="Free SIP calculator from BTW IMF. Move three sliders — monthly amount, period and expected return — to see your invested amount, estimated returns and projected corpus, with a year-by-year growth chart. AMFI-registered advisors, Mumbai & Pune.">
+<meta name="theme-color" content="#263972">
+<link rel="canonical" href="https://btwimf.com/calculator/">
+<meta property="og:image" content="https://btwimf.com/assets/img/btw-imf-logo.png">
+<meta property="og:image:alt" content="BTW Financial Services &amp; IMF Pvt Ltd">
+<meta property="og:site_name" content="BTW IMF">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SIP Calculator — Project Your Mutual Fund Investment Growth | BTW IMF">
+<meta name="twitter:description" content="Move three sliders to see your invested amount, estimated returns and projected corpus, with a year-by-year growth chart. Free tool from BTW IMF's AMFI-registered advisors.">
+<meta name="twitter:image" content="https://btwimf.com/assets/img/btw-imf-logo.png">
+<meta property="og:title" content="SIP Calculator — Project Your Mutual Fund Investment Growth | BTW IMF">
+<meta property="og:description" content="Move three sliders to see your invested amount, estimated returns and projected corpus, with a year-by-year growth chart. Free tool from BTW IMF's AMFI-registered advisors.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://btwimf.com/calculator/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23263972'/%3E%3Cpath d='M32 12l14 6v10c0 9-6 15.5-14 18-8-2.5-14-9-14-18V18z' fill='none' stroke='%237BBFA7' stroke-width='4'/%3E%3Cpath d='M25 32l5 5 10-11' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assets/css/fonts.css">
+<link rel="stylesheet" href="../assets/css/style.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "BreadcrumbList",
+ "itemListElement": [
+  { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://btwimf.com/" },
+  { "@type": "ListItem", "position": 2, "name": "SIP Calculator", "item": "https://btwimf.com/calculator/" }
+ ]
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebApplication",
+ "name": "BTW IMF SIP Calculator",
+ "url": "https://btwimf.com/calculator/",
+ "applicationCategory": "FinanceApplication",
+ "operatingSystem": "All",
+ "browserRequirements": "Requires JavaScript",
+ "description": "A Systematic Investment Plan (SIP) calculator that projects the future value of a monthly mutual fund investment from the monthly amount, the investment period and an assumed annual rate of return.",
+ "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+ "provider": {
+  "@type": "InsuranceAgency",
+  "name": "BTW Financial Services & IMF Pvt Ltd",
+  "url": "https://btwimf.com",
+  "telephone": "+91-22-69302820",
+  "email": "info@btwimf.com"
+ }
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "What is a SIP?",
+   "acceptedAnswer": { "@type": "Answer", "text": "A Systematic Investment Plan (SIP) is a way of investing a fixed amount into a mutual fund scheme at a regular interval, usually monthly. The amount is auto-debited from your bank account and buys units at whatever the price is on that date, so you average your cost over market ups and downs instead of trying to time the market." }
+  },
+  {
+   "@type": "Question",
+   "name": "How accurate is this SIP calculator?",
+   "acceptedAnswer": { "@type": "Answer", "text": "It is an illustration, not a forecast. It assumes a single, constant annual rate of return for the whole period and that every instalment is invested on time. Real mutual fund returns vary year to year and can be negative in some years, so your actual corpus will differ from the figure shown." }
+  },
+  {
+   "@type": "Question",
+   "name": "What rate of return should I enter?",
+   "acceptedAnswer": { "@type": "Answer", "text": "As a rough guide, diversified equity funds in India have delivered around 11–12% a year over long periods, hybrid funds less, and debt funds around 6–8% — none of it guaranteed. Use a conservative number and check the result again with a lower rate to see the downside. An advisor can help you set a realistic assumption for your fund mix." }
+  },
+  {
+   "@type": "Question",
+   "name": "Does the calculator account for inflation, taxes and fund charges?",
+   "acceptedAnswer": { "@type": "Answer", "text": "No. It shows a gross projection. In practice the scheme's expense ratio is already reflected in the fund's returns, and on redemption you may pay capital gains tax (for equity funds, 12.5% on long-term gains above the annual exemption). Inflation also reduces what the final corpus can buy. Treat the figure as a before-tax, before-inflation estimate." }
+  },
+  {
+   "@type": "Question",
+   "name": "Can I increase or pause my SIP later?",
+   "acceptedAnswer": { "@type": "Answer", "text": "Yes. Most schemes let you step up the SIP amount each year, add lump sums, pause instalments for a few months, or stop altogether without penalty. Stepping up the amount as your income grows has a large effect on the final corpus." }
+  },
+  {
+   "@type": "Question",
+   "name": "How do I start a SIP with BTW IMF?",
+   "acceptedAnswer": { "@type": "Answer", "text": "BTW Financial Services & IMF Pvt Ltd is an AMFI-registered mutual fund distributor (ARN-282372). Contact us for a free consultation — an advisor will help you complete KYC, choose schemes suited to your goals and risk profile, and set up the auto-debit. There is no advisory fee." }
+  }
+ ]
+}
+</script>
+</head>
+<body id="top">
+<a class="skip" href="#main">Skip to main content</a>
+<div class="topbar">
+  <div class="container topbar-row">
+    <p class="topbar-cred">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.6-3 7.7-7 9-4-1.3-7-4.4-7-9V6z"/><path d="M9.2 11.8l2 2 3.8-4.3"/></svg>
+      <strong>IRDAI Licensed Insurance Marketing Firm</strong>
+      <span class="tb-hide">&nbsp;&middot; Licence IMF07490120240649 &middot; AMFI ARN-282372</span>
+    </p>
+    <div class="topbar-links">
+      <a class="tb-hide-m" href="tel:+912245260380"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l1.5 4.5L8 10a12 12 0 006 6l1.5-2.5L20 15v4a2 2 0 01-2 2A15 15 0 013 6a2 2 0 012-2z"/></svg>022 45260 380</a>
+      <a href="mailto:info@btwimf.com"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>info@btwimf.com</a>
+      <span class="tb-loc tb-hide-m"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-5.5-7-11a7 7 0 0114 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>Mumbai &middot; Pune</span>
+    </div>
+  </div>
+</div>
+<header class="header" id="header">
+  <div class="container nav-row">
+    <a class="brand" href="../index.html" aria-label="BTW Financial Services &amp; IMF — home">
+      <img class="brand-logo" src="../assets/img/btw-imf-logo.png" alt="BTW Financial Services &amp; IMF Pvt Ltd" width="413" height="179">
+    </a>
+    <nav class="mainnav" aria-label="Primary">
+      <ul>
+        <li class="has-drop">
+          <button type="button" class="navlink drop-btn" aria-expanded="false" aria-controls="dd-insurance">Insurance
+            <svg class="caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="drop drop-mega" id="dd-insurance" role="group" aria-label="Insurance products">
+            <div class="drop-cols">
+              <div>
+                <p class="drop-h">Health &amp; Life</p>
+                <a href="../products/health-insurance/">Health Insurance</a>
+                <a href="../products/family-health-insurance/">Family Health Insurance</a>
+                <a href="../products/top-up-health-insurance/">Top-Up Health Insurance</a>
+                <a href="../products/critical-illness-insurance/">Critical Illness Cover</a>
+                <a href="../products/personal-accident-insurance/">Personal Accident</a>
+                <a href="../products/life-insurance/">Life Insurance</a>
+                <a href="../products/term-life-insurance/">Term Life Insurance</a>
+              </div>
+              <div>
+                <p class="drop-h">Motor &amp; Travel</p>
+                <a href="../products/car-insurance/">Car Insurance</a>
+                <a href="../products/bike-insurance/">Two-Wheeler Insurance</a>
+                <a href="../products/motor-insurance/">Motor Insurance</a>
+                <a href="../auto-insurance/">Auto Insurance</a>
+                <a href="../products/travel-insurance/">Travel Insurance</a>
+              </div>
+              <div>
+                <p class="drop-h">Home, Shop &amp; Marine</p>
+                <a href="../products/home-insurance/">Home Insurance</a>
+                <a href="../products/fire-insurance/">Fire &amp; Special Perils</a>
+                <a href="../shop-insurance/">Shop Insurance</a>
+                <a href="../products/marine-insurance/">Marine Insurance</a>
+                <a href="../marine-cargo-insurance-policy/">Marine Cargo Policy</a>
+              </div>
+              <div>
+                <p class="drop-h">Business &amp; Group</p>
+                <a href="../products/business-insurance/">Business Insurance</a>
+                <a href="../products/commercial-insurance/">Commercial Insurance</a>
+                <a href="../products/industrial-insurance/">Industrial Insurance</a>
+                <a href="../products/project-insurance/">Project Insurance</a>
+                <a href="../products/liabilities-insurance/">Liability Insurance</a>
+                <a href="../products/cyber-insurance/">Cyber Insurance</a>
+                <a href="../products/group-health-insurance/">Group Health Insurance</a>
+                <a href="../products/employee-group-health-insurance/">Employee Group Health</a>
+              </div>
+            </div>
+            <div class="drop-foot">
+              <span class="drop-foot-links">Also: <a href="../workmen-compensation-policy/">Workmen Compensation</a> <a href="../products/pet-insurance/">Pet Insurance</a></span>
+              <a class="drop-foot-all" href="../products/">Browse all 27 insurance products
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            </div>
+          </div>
+        </li>
+        <li><a class="navlink" href="../index.html#wealth">Investments</a></li>
+        <li class="has-drop">
+          <button type="button" class="navlink drop-btn" aria-expanded="false" aria-controls="dd-services">Claims &amp; Services
+            <svg class="caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="drop drop-slim" id="dd-services" role="group" aria-label="Claims and services">
+            <a href="../claims/">Claims Assistance</a>
+            <a href="../renewals/">Policy Renewals</a>
+            <a href="../calculator/" aria-current="page">SIP Calculator</a>
+            <a href="../contact/#contact-form">Free Home Consultation</a>
+            <a href="https://btwimf.com/wp-content/uploads/2025/11/BTW-IMF-Brochure-2.pdf">Download Brochure</a>
+          </div>
+        </li>
+        <li><a class="navlink" href="../about/">About Us</a></li>
+        <li><a class="navlink" href="../contact/">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <a class="nav-phone" href="tel:+912269302820">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l1.5 4.5L8 10a12 12 0 006 6l1.5-2.5L20 15v4a2 2 0 01-2 2A15 15 0 013 6a2 2 0 012-2z"/></svg>
+        <span>022 6930 2820</span>
+      </a>
+      <a class="btn btn-accent btn-sm" href="../contact/#contact-form">Get a Quote</a>
+      <button type="button" class="burger" id="burger" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-label="Mobile menu">
+  <nav aria-label="Mobile primary">
+    <button type="button" class="d-acc" aria-expanded="false" aria-controls="d-ins">Insurance<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+    <div class="d-panel" id="d-ins">
+      <a href="../products/health-insurance/">Health Insurance</a>
+      <a href="../products/family-health-insurance/">Family Health Insurance</a>
+      <a href="../products/top-up-health-insurance/">Top-Up Health Insurance</a>
+      <a href="../products/critical-illness-insurance/">Critical Illness Cover</a>
+      <a href="../products/personal-accident-insurance/">Personal Accident</a>
+      <a href="../products/life-insurance/">Life Insurance</a>
+      <a href="../products/term-life-insurance/">Term Life Insurance</a>
+      <a href="../products/car-insurance/">Car Insurance</a>
+      <a href="../products/bike-insurance/">Two-Wheeler Insurance</a>
+      <a href="../products/motor-insurance/">Motor Insurance</a>
+      <a href="../auto-insurance/">Auto Insurance</a>
+      <a href="../products/travel-insurance/">Travel Insurance</a>
+      <a href="../products/home-insurance/">Home Insurance</a>
+      <a href="../products/fire-insurance/">Fire &amp; Special Perils</a>
+      <a href="../shop-insurance/">Shop Insurance</a>
+      <a href="../products/marine-insurance/">Marine Insurance</a>
+      <a href="../marine-cargo-insurance-policy/">Marine Cargo Policy</a>
+      <a href="../products/business-insurance/">Business Insurance</a>
+      <a href="../products/commercial-insurance/">Commercial Insurance</a>
+      <a href="../products/industrial-insurance/">Industrial Insurance</a>
+      <a href="../products/project-insurance/">Project Insurance</a>
+      <a href="../products/liabilities-insurance/">Liability Insurance</a>
+      <a href="../products/cyber-insurance/">Cyber Insurance</a>
+      <a href="../products/group-health-insurance/">Group Health Insurance</a>
+      <a href="../products/employee-group-health-insurance/">Employee Group Health</a>
+      <a href="../workmen-compensation-policy/">Workmen Compensation</a>
+      <a href="../products/pet-insurance/">Pet Insurance</a>
+      <a href="../products/">View all 27 products →</a>
+    </div>
+    <a class="d-link" href="../index.html#wealth">Investments</a>
+    <button type="button" class="d-acc" aria-expanded="false" aria-controls="d-srv">Claims &amp; Services<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+    <div class="d-panel" id="d-srv">
+      <a href="../claims/">Claims Assistance</a>
+      <a href="../renewals/">Policy Renewals</a>
+      <a href="../calculator/" aria-current="page">SIP Calculator</a>
+      <a href="../contact/#contact-form">Free Home Consultation</a>
+    </div>
+    <a class="d-link" href="../about/">About Us</a>
+    <a class="d-link" href="../contact/">Contact</a>
+  </nav>
+  <div class="drawer-ctas">
+    <a class="btn btn-accent" href="../contact/#contact-form">Get a Quote</a>
+    <a class="btn btn-outline-dark" href="tel:+912269302820">Call 022 6930 2820</a>
+  </div>
+</aside>
+
+<main id="main">
+
+<section class="page-hero calc-hero">
+  <div class="hero-shade" aria-hidden="true"></div>
+  <svg class="deco deco-dots" width="240" height="160" aria-hidden="true" focusable="false">
+    <defs><pattern id="dg" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="2.2" cy="2.2" r="2.2" fill="rgba(123,191,167,.4)"/></pattern></defs>
+    <rect width="240" height="160" fill="url(#dg)"/>
+  </svg>
+  <div class="container">
+    <nav class="crumb rv" aria-label="Breadcrumb">
+      <a href="../index.html">Home</a>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      <span aria-current="page">SIP Calculator</span>
+    </nav>
+    <span class="eyebrow eyebrow-light rv">Investment Tools</span>
+    <h1 class="rv">SIP Calculator</h1>
+    <p class="lead rv">Set your monthly amount, how long you'll invest, and a realistic rate of return &mdash; and see what you'd put in, what it could grow to, and how that gap widens year after year.</p>
+    <div class="hero-ctas rv" style="margin-top:24px">
+      <a class="btn btn-accent btn-lg" href="../contact/#contact-form">Start Your Investment Journey
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="btn btn-outline-light btn-lg" href="#how-it-works">How the maths works</a>
+    </div>
+  </div>
+</section>
+
+<section class="calc-section" id="calculator">
+  <div class="container">
+    <div class="sip-wrap rv" id="sip-calc">
+      <div class="sip-card">
+        <div class="sip-head">
+          <div>
+            <h2>Your SIP projection</h2>
+            <p>Drag any slider &mdash; the numbers and chart update instantly.</p>
+          </div>
+          <span class="sip-live"><i></i>Live estimate</span>
+        </div>
+
+        <div class="sliders">
+          <div class="sl sl-blue">
+            <label for="amt">Monthly investment <output id="amtO" for="amt">₹10,000</output></label>
+            <input type="range" id="amt" min="1000" max="100000" step="1000" value="10000">
+          </div>
+          <div class="sl sl-teal">
+            <label for="yrs">Investment period <output id="yrsO" for="yrs">15 years</output></label>
+            <input type="range" id="yrs" min="1" max="30" value="15">
+          </div>
+          <div class="sl sl-amber">
+            <label for="ret">Expected return (p.a.) <output id="retO" for="ret">12%</output></label>
+            <input type="range" id="ret" min="6" max="18" value="12">
+          </div>
+        </div>
+
+        <div class="sip-dash">
+          <div class="sip-donut-col">
+            <div class="donut-box">
+              <svg class="donut" viewBox="0 0 42 42" aria-hidden="true" focusable="false">
+                <circle class="donut-track" cx="21" cy="21" r="15.9155"/>
+                <circle id="dInv" class="donut-seg seg-inv" cx="21" cy="21" r="15.9155"/>
+                <circle id="dRet" class="donut-seg seg-ret" cx="21" cy="21" r="15.9155"/>
+              </svg>
+              <div class="donut-center">
+                <span>Total corpus</span>
+                <b id="corpus">₹50.0 L</b>
+              </div>
+            </div>
+            <ul class="donut-legend">
+              <li><i class="lg lg-inv"></i>Invested amount<b id="invested">₹18.0 L</b></li>
+              <li><i class="lg lg-ret"></i>Wealth gained<b id="returns">₹32.0 L</b></li>
+            </ul>
+          </div>
+          <div class="sip-bars-col">
+            <div class="bars-head"><span>Growth trajectory</span><b id="mult">2.8x your money</b></div>
+            <svg id="sipBars" viewBox="0 0 260 118" preserveAspectRatio="none" aria-hidden="true" focusable="false"></svg>
+            <div class="bars-x" id="barsX"><span>Year 1</span><span>Year 8</span><span>Year 15</span></div>
+          </div>
+        </div>
+
+        <div class="sip-cards">
+          <div class="sc sc-blue"><span>Invested amount</span><b id="scInv">₹18.0 L</b></div>
+          <div class="sc sc-teal"><span>Estimated returns</span><b id="scRet">₹32.0 L</b></div>
+          <div class="sc sc-navy"><span>Projected corpus</span><b id="scTot">₹50.0 L</b></div>
+        </div>
+
+        <p class="sip-fine">Illustration only. Actual returns vary with market performance. Past performance is not indicative of future returns.</p>
+      </div>
+    </div>
+
+    <ul class="calc-points rv" aria-label="What this calculator shows">
+      <li>
+        <span class="cp-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M9 14.5l2 2 4-4"/></svg></span>
+        <h3>Invested vs. corpus</h3>
+        <p>How much of the final value is your own money, and how much is growth.</p>
+      </li>
+      <li>
+        <span class="cp-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5.5-5.5 3.5 3.5L20 7"/><path d="M14.5 7H20v5.5"/></svg></span>
+        <h3>Growth trajectory</h3>
+        <p>A year-by-year view of how compounding accelerates the longer you stay invested.</p>
+      </li>
+      <li>
+        <span class="cp-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+        <h3>Instant &amp; private</h3>
+        <p>Every slider recalculates live. Nothing is submitted or stored anywhere.</p>
+      </li>
+      <li>
+        <span class="cp-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9"/><path d="M12 3a9 9 0 109 9h-9z"/></svg></span>
+        <h3>Then talk to an advisor</h3>
+        <p>Our AMFI-registered team (ARN-282372) can turn the estimate into a real plan.</p>
+      </li>
+    </ul>
+
+    <p class="calc-compliance rv">Mutual fund investments are subject to market risks. Please read all scheme-related documents carefully before investing.</p>
+  </div>
+</section>
+
+<section class="section" style="background:#fff" id="why-sip">
+  <div class="container">
+    <header class="sec-head center">
+      <span class="eyebrow rv">Why a SIP</span>
+      <h2 class="rv">Small amounts, invested with discipline</h2>
+      <p class="lead rv">A SIP takes the two hardest parts of investing — starting, and staying consistent — and automates them.</p>
+    </header>
+    <div class="step-grid">
+      <div class="step-card rv"><h3>You average your cost</h3><p>Because the same amount is invested every month, you buy more units when prices are low and fewer when they're high — so you don't need to guess market tops and bottoms.</p></div>
+      <div class="step-card rv"><h3>Compounding does the work</h3><p>Returns earn their own returns. The growth portion of the chart starts small and then pulls away from your invested amount — most of it in the later years.</p></div>
+      <div class="step-card rv"><h3>It fits a salary</h3><p>You can start with as little as ₹500–₹1,000 a month and step the amount up each year as your income grows.</p></div>
+      <div class="step-card rv"><h3>It stays flexible</h3><p>Pause, increase, reduce or stop instalments any time. Redeem partially or fully when you reach the goal — there's no lock-in for open-ended funds (ELSS excepted).</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--canvas)" id="how-it-works">
+  <div class="container">
+    <header class="sec-head center">
+      <span class="eyebrow rv">Under the hood</span>
+      <h2 class="rv">How this calculator works</h2>
+      <p class="lead rv">It uses the standard future-value-of-a-series formula, compounded monthly.</p>
+    </header>
+    <div class="calc-method rv">
+      <p class="calc-formula"><strong>FV = P &times; ( [ (1 + i)<sup>n</sup> &minus; 1 ] &divide; i ) &times; (1 + i)</strong></p>
+      <ul>
+        <li><strong>P</strong> — your monthly investment (the "Monthly investment" slider)</li>
+        <li><strong>i</strong> — monthly rate of return = (annual return &divide; 12) &divide; 100</li>
+        <li><strong>n</strong> — number of monthly instalments = investment period in years &times; 12</li>
+      </ul>
+      <p><strong>Invested amount</strong> = P &times; n &nbsp;&middot;&nbsp; <strong>Estimated returns</strong> = FV &minus; Invested amount &nbsp;&middot;&nbsp; <strong>Projected corpus</strong> = FV</p>
+      <p class="calc-assume">The instalment is assumed to be paid at the <em>start</em> of each month and the rate of return is assumed to stay constant for the whole period. Everything runs in your browser — no inputs are sent anywhere or saved.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:#fff" id="limits">
+  <div class="container">
+    <header class="sec-head center">
+      <span class="eyebrow rv">Read this before you rely on the number</span>
+      <h2 class="rv">What the estimate does <em>not</em> include</h2>
+    </header>
+    <div class="feat-grid-2">
+      <div class="lim-card rv"><h3>Market ups and downs</h3><p>Real returns are never a straight line. A constant rate hides the sequence risk of a bad few years near the end, when your corpus is largest.</p></div>
+      <div class="lim-card rv"><h3>Tax on redemption</h3><p>Long-term capital gains on equity mutual funds are taxed at 12.5% above the annual exemption; debt fund gains are taxed at your slab rate. The calculator shows a pre-tax figure.</p></div>
+      <div class="lim-card rv"><h3>Inflation</h3><p>₹1 crore in 20 years will not buy what ₹1 crore buys today. For goal planning, discount the target back to today's money or raise your target.</p></div>
+      <div class="lim-card rv"><h3>Step-ups &amp; lump sums</h3><p>The projection assumes a flat monthly amount for the entire period. Increasing the SIP annually, or adding bonuses as lump sums, changes the outcome significantly.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--canvas)" id="faqs">
+  <div class="container">
+    <header class="sec-head center">
+      <span class="eyebrow rv">FAQs</span>
+      <h2 class="rv">SIP calculator &mdash; frequently asked questions</h2>
+    </header>
+    <div class="faq">
+      <details class="rv"><summary>What is a SIP?</summary><div><p>A Systematic Investment Plan (SIP) is a way of investing a fixed amount into a mutual fund scheme at a regular interval, usually monthly. The amount is auto-debited from your bank account and buys units at whatever the price is on that date, so you average your cost over market ups and downs instead of trying to time the market.</p></div></details>
+      <details class="rv"><summary>How accurate is this SIP calculator?</summary><div><p>It is an illustration, not a forecast. It assumes a single, constant annual rate of return for the whole period and that every instalment is invested on time. Real mutual fund returns vary year to year and can be negative in some years, so your actual corpus will differ from the figure shown.</p></div></details>
+      <details class="rv"><summary>What rate of return should I enter?</summary><div><p>As a rough guide, diversified equity funds in India have delivered around 11&ndash;12% a year over long periods, hybrid funds less, and debt funds around 6&ndash;8% &mdash; none of it guaranteed. Use a conservative number, then check the result again with a lower rate to see the downside. An advisor can help you set a realistic assumption for your fund mix.</p></div></details>
+      <details class="rv"><summary>Does the calculator account for inflation, taxes and fund charges?</summary><div><p>No. It shows a gross projection. The scheme's expense ratio is already reflected in the fund's returns, and on redemption you may pay capital gains tax (for equity funds, 12.5% on long-term gains above the annual exemption). Inflation also reduces what the final corpus can buy. Treat the figure as a before-tax, before-inflation estimate.</p></div></details>
+      <details class="rv"><summary>Can I increase or pause my SIP later?</summary><div><p>Yes. Most schemes let you step up the SIP amount each year, add lump sums, pause instalments for a few months, or stop altogether without penalty. Stepping up the amount as your income grows has a large effect on the final corpus.</p></div></details>
+      <details class="rv"><summary>How do I start a SIP with BTW IMF?</summary><div><p>BTW Financial Services &amp; IMF Pvt Ltd is an AMFI-registered mutual fund distributor (ARN-282372). Contact us for a free consultation &mdash; an advisor will help you complete KYC, choose schemes suited to your goals and risk profile, and set up the auto-debit. There is no advisory fee.</p></div></details>
+    </div>
+  </div>
+</section>
+
+<section class="lead-band section">
+  <div class="container">
+    <div>
+      <h2 class="rv">Ready to turn the estimate into a plan?</h2>
+      <p class="rv">Talk to an AMFI-registered advisor about goals, fund selection and setting up your SIP. Free, with no obligation.</p>
+    </div>
+    <a class="btn btn-accent btn-lg rv" href="../contact/#contact-form">
+      Book a Free Consultation
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div>
+</section>
+
+<section class="licensed-by" aria-label="Licences and recognitions">
+  <div class="container">
+    <h2>Licensed &amp; recognised by</h2>
+    <p class="lb-sub">BTW Financial Services &amp; IMF Pvt Ltd operates under the following statutory registrations.</p>
+    <div class="lb-grid">
+      <div class="lb-card">
+        <div class="lb-logo"><img src="../assets/img/lic-irdai.jpg" alt="Insurance Regulatory and Development Authority of India (IRDAI)" width="120" height="120" loading="lazy"></div>
+        <b>IRDAI Insurance Marketing Firm</b>
+        <span>Licence No. IMF07490120240649</span>
+      </div>
+      <div class="lb-card">
+        <div class="lb-logo"><img src="../assets/img/lic-amfi.png" alt="Association of Mutual Funds in India (AMFI)" width="120" height="144" loading="lazy"></div>
+        <b>AMFI-Registered Mutual Fund Distributor</b>
+        <span>ARN-282372</span>
+      </div>
+      <div class="lb-card">
+        <div class="lb-logo"><img src="../assets/img/lic-startup-india.png" alt="Startup India" width="180" height="100" loading="lazy"></div>
+        <b>Startup India Recognised</b>
+        <span>Certificate No. DIPP144064</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container f-grid">
+    <div class="f-brand">
+      <a class="brand brand-inv" href="../index.html" aria-label="BTW Financial Services &amp; IMF — home">
+        <img class="brand-logo brand-logo-card" src="../assets/img/btw-imf-logo.png" alt="BTW Financial Services &amp; IMF Pvt Ltd" width="413" height="179">
+      </a>
+      <p>IRDAI-licensed insurance marketing firm and AMFI-registered mutual fund distributor — helping 10,000+ Indian families protect and grow what matters. A BTW Group company.</p>
+      <div class="f-badges">
+        <span>IRDAI &middot; IMF07490120240649</span>
+        <span>AMFI &middot; ARN-282372</span>
+        <span>Startup India &middot; DIPP144064</span>
+      </div>
+      <div class="socials">
+        <a href="https://x.com/btwimf" target="_blank" rel="noopener" aria-label="BTW IMF on X"><svg viewBox="0 0 24 24"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.3l-4.9-6.4L6.2 22H3l7.3-8.4L1.5 2h6.4l4.4 5.9L18.9 2zM17.8 20.1h1.7L7.1 3.8H5.3l12.5 16.3z"/></svg></a>
+        <a href="https://www.instagram.com/btwimf/" target="_blank" rel="noopener" aria-label="BTW IMF on Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.9.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.6-.1-4.8s0-3.6.1-4.8C2.4 4 4 2.4 7.2 2.3c1.2-.1 1.6-.1 4.8-.1zm0 3.7a6.1 6.1 0 100 12.2 6.1 6.1 0 000-12.2zm0 10a4 4 0 110-7.9 4 4 0 010 7.9zm6.4-10.2a1.4 1.4 0 100 2.9 1.4 1.4 0 000-2.9z"/></svg></a>
+        <a href="https://www.facebook.com/btwimf/" target="_blank" rel="noopener" aria-label="BTW IMF on Facebook"><svg viewBox="0 0 24 24"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.7c0-.9.3-1.6 1.6-1.6h1.7V4.2c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.4H7.4V14h2.7v8z"/></svg></a>
+        <a href="https://www.youtube.com/@BTWIMF" target="_blank" rel="noopener" aria-label="BTW IMF on YouTube"><svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31 31 0 000 12a31 31 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31 31 0 0024 12a31 31 0 00-.5-5.8zM9.6 15.6V8.4L15.8 12z"/></svg></a>
+        <a href="https://www.linkedin.com/company/btw-imf/" target="_blank" rel="noopener" aria-label="BTW IMF on LinkedIn"><svg viewBox="0 0 24 24"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.2 8h4.6v14H.2zM8.2 8h4.4v1.9h.1c.6-1.1 2.1-2.3 4.3-2.3 4.6 0 5.4 3 5.4 6.9V22h-4.6v-6.6c0-1.6 0-3.6-2.2-3.6s-2.6 1.7-2.6 3.5V22H8.2z"/></svg></a>
+        <a href="https://www.threads.com/@btwimf" target="_blank" rel="noopener" aria-label="BTW IMF on Threads"><svg viewBox="0 0 24 24"><text x="12" y="17" text-anchor="middle" font-size="16" font-weight="700" font-family="Inter,sans-serif" fill="currentColor">@</text></svg></a>
+      </div>
+    </div>
+    <nav class="f-col" aria-label="Footer insurance products">
+      <h4>Insurance</h4>
+      <ul>
+        <li><a href="../products/health-insurance/">Health Insurance</a></li>
+        <li><a href="../products/term-life-insurance/">Term Life Insurance</a></li>
+        <li><a href="../products/car-insurance/">Car Insurance</a></li>
+        <li><a href="../products/travel-insurance/">Travel Insurance</a></li>
+        <li><a href="../products/marine-insurance/">Marine Cargo Insurance</a></li>
+        <li><a href="../products/employee-group-health-insurance/">Group Health for Employers</a></li>
+        <li><a href="../products/">All insurance products</a></li>
+      </ul>
+    </nav>
+    <nav class="f-col" aria-label="Footer quick links">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="../about/">About Us</a></li>
+        <li><a href="../team/">Our Team</a></li>
+        <li><a href="../claims/">Claims Assistance</a></li>
+        <li><a href="../renewals/">Policy Renewals</a></li>
+        <li><a href="../calculator/">SIP Calculator</a></li>
+        <li><a href="../blogs/">Blogs</a></li>
+        <li><a href="../careers/">Careers</a></li>
+        <li><a href="https://btwimf.com/start-your-partner-journey/">Become a Partner</a></li>
+      </ul>
+    </nav>
+    <div class="f-col f-contact">
+      <h4>Contact</h4>
+      <address>
+        <div>
+          <b>Mumbai &middot; Headquarters</b>
+          Office No. B.14, Civic Center, MMGS Marg,<br>Dadar East, Mumbai 400014
+          <a href="tel:+912245260380">022 45260 380</a> &middot; <a href="tel:+912269302820">022 6930 2820</a>
+        </div>
+        <div>
+          <b>Pune Office</b>
+          Prashant Bunglow, 33/15 Karve Rd,<br>opp. Garware College, Deccan Gymkhana, Pune 411004
+          <a href="tel:+912042238460">020 4223 8460</a>
+        </div>
+        <div>
+          <b>Email &amp; WhatsApp</b>
+          <a href="mailto:info@btwimf.com">info@btwimf.com</a>
+          <a href="https://wa.me/919004383987" target="_blank" rel="noopener">+91 90043 83987</a>
+        </div>
+      </address>
+    </div>
+  </div>
+  <div class="container f-group">
+    <span>A BTW Group company</span>
+    <ul>
+      <li><a href="https://btwvisas.com/" target="_blank" rel="noopener">BTW Visa Services</a></li>
+      <li><a href="https://journeycartholidays.com/" target="_blank" rel="noopener">Journey Cart Holidays</a></li>
+      <li><a href="https://pecattestation.com/" target="_blank" rel="noopener">PEC Attestation</a></li>
+      <li><a href="https://www.pectranslation.com/" target="_blank" rel="noopener">PEC Translation</a></li>
+      <li><a href="https://pisumfoods.com/" target="_blank" rel="noopener">Pisum Foods</a></li>
+      <li><a href="https://www.travindinstitute.com/" target="_blank" rel="noopener">Travind Institute</a></li>
+      <li><a href="https://wgbl.co/" target="_blank" rel="noopener">WGBL India</a></li>
+    </ul>
+  </div>
+  <div class="container f-disclaimer">
+    <strong>Disclaimer:</strong> Insurance is the subject matter of solicitation. Information submitted on this website may be shared with insurers. Product information is based on details received from insurers with whom we have an agreement. BTW IMF acts as an intermediary; final approval of any claim rests with the respective insurance company under applicable IRDAI regulations. Mutual Fund investments are subject to market risks. Please read all scheme-related documents carefully before investing. Past performance is not indicative of future returns. The SIP calculator on this page is an illustrative tool and does not constitute investment advice or a guarantee of returns.
+  </div>
+  <div class="container f-bottom">
+    <span>&copy; <span id="yr">2026</span> BTW Financial Services &amp; IMF Pvt Ltd &middot; All rights reserved</span>
+    <nav class="f-legal" aria-label="Legal">
+      <a href="https://btwimf.com/privacy-policy/">Privacy Policy</a>
+      <a href="https://btwimf.com/terms-conditions/">Terms &amp; Conditions</a>
+      <a href="https://btwimf.com/cancellation-refund/">Cancellation &amp; Refund</a>
+    </nav>
+  </div>
+</footer>
+
+<div class="mobilebar" aria-label="Quick actions">
+  <a href="tel:+912269302820"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l1.5 4.5L8 10a12 12 0 006 6l1.5-2.5L20 15v4a2 2 0 01-2 2A15 15 0 013 6a2 2 0 012-2z"/></svg>Call</a>
+  <a class="mb-wa" href="https://wa.me/919004383987?text=Hi%20BTW%20IMF%2C%20I%27d%20like%20a%20free%20consultation." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2z"/></svg>WhatsApp</a>
+  <a class="mb-quote" href="../contact/#contact-form">Get a Quote</a>
+</div>
+
+<script src="../assets/js/main.js" defer></script>
+</body>
+</html>
