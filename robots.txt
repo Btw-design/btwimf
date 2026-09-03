@@ -2,7 +2,9 @@ User-agent: *
 Allow: /
 
 # Internal / non-content paths
+Disallow: /admin/
 Disallow: /_submissions/
+Disallow: /_blog-data/
 Disallow: /form-handler.php
 
 Sitemap: https://btwimf.com/sitemap.xml
