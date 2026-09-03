@@ -1,0 +1,17 @@
+# Blog admin — protect config + data, allow PHP.
+<FilesMatch "\.(json|log|md)$">
+  Require all denied
+</FilesMatch>
+<Files "config.php">
+  Require all denied
+</Files>
+<Files "config.sample.php">
+  Require all denied
+</Files>
+<Files "lib.php">
+  Require all denied
+</Files>
+<Files "render.php">
+  Require all denied
+</Files>
+Options -Indexes

@@ -5,9 +5,10 @@ Options -Indexes
 # Custom error page
 ErrorDocument 404 /404.html
 
-# Protect stored form submissions and internal folders
+# Protect stored form submissions, blog data and internal folders
 RewriteEngine On
 RewriteRule ^_submissions(/.*)?$ - [F,L]
+RewriteRule ^_blog-data(/.*)?$ - [F,L]
 
 # Legacy .html → clean folder URLs (root pages moved into folders)
 RewriteRule ^about\.html$    /about/    [R=301,L]
