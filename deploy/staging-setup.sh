@@ -22,9 +22,15 @@ DOCROOT="${DOCROOT:-/var/www/btwimf-new}"
 PORT="${PORT:-8090}"
 SITE_NAME="${SITE_NAME:-btwimf-staging}"
 WEB_USER="${WEB_USER:-www-data}"
-BUNDLE="${1:-}"
+
 DRY=0
-[[ "${1:-}" == "--dry-run" || "${2:-}" == "--dry-run" ]] && DRY=1
+BUNDLE=""
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run) DRY=1 ;;
+    *)         BUNDLE="$arg" ;;
+  esac
+done
 
 say() { printf '\n\033[1;36m▶ %s\033[0m\n' "$*"; }
 ok()  { printf '  \033[32m✓\033[0m %s\n' "$*"; }
@@ -133,9 +139,9 @@ IP="$(curl -s --max-time 3 http://169.254.169.254/latest/meta-data/public-ipv4 2
 [[ -z "$IP" ]] && IP="<your-ec2-public-ip>"
 cat <<EOF
 
-\033[1;32m─────────────────────────────────────────────────────────────\033[0m
+=============================================================
  STAGING IS UP.  Staging URL:   http://${IP}:${PORT}/
-\033[1;32m─────────────────────────────────────────────────────────────\033[0m
+=============================================================
 
 Next (all inside ${DOCROOT}, nothing live is touched):
 
