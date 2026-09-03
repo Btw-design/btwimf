@@ -1,2 +1,8 @@
 # Shell scripts must stay LF so they run on Linux.
 *.sh text eol=lf
+
+# Keep the production/webroot bundle (git archive) lean — dev-only paths.
+/deploy         export-ignore
+/.gitignore     export-ignore
+/.gitattributes export-ignore
+/admin/README.md export-ignore
