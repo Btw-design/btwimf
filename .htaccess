@@ -49,8 +49,13 @@ RewriteRule ^(.+?)/?$ $1.html [L]
   Header set X-Frame-Options "SAMEORIGIN"
 </IfModule>
 
+<IfModule mod_mime.c>
+  AddType image/x-icon                .ico
+  AddType application/manifest+json   .webmanifest
+</IfModule>
+
 <IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml application/xml
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml application/xml application/manifest+json
 </IfModule>
 
 <IfModule mod_expires.c>
@@ -61,5 +66,6 @@ RewriteRule ^(.+?)/?$ $1.html [L]
   ExpiresByType image/png "access plus 30 days"
   ExpiresByType image/webp "access plus 30 days"
   ExpiresByType image/svg+xml "access plus 30 days"
+  ExpiresByType image/x-icon "access plus 30 days"
   ExpiresByType font/woff2 "access plus 1 year"
 </IfModule>

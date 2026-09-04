@@ -1,0 +1,11 @@
+{
+  "name": "BTW Financial Services & IMF Pvt Ltd",
+  "short_name": "BTW IMF",
+  "icons": [
+    { "src": "/assets/img/favicon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/assets/img/favicon-512.png", "type": "image/png", "sizes": "512x512" }
+  ],
+  "theme_color": "#263972",
+  "background_color": "#ffffff",
+  "display": "browser"
+}

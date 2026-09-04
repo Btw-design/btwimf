@@ -48,7 +48,11 @@ function _head(string $title, string $desc, string $canon, string $ogtype, strin
         $ldb .= '<script type="application/ld+json">' . "\n"
               . json_encode($obj, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . "\n</script>\n";
     }
-    $icon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23263972'/%3E%3Cpath d='M32 12l14 6v10c0 9-6 15.5-14 18-8-2.5-14-9-14-18V18z' fill='none' stroke='%237BBFA7' stroke-width='4'/%3E%3Cpath d='M25 32l5 5 10-11' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E";
+    $favicons = "<link rel=\"icon\" href=\"/favicon.ico\" sizes=\"any\">\n"
+              . "<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/assets/img/favicon-32.png\">\n"
+              . "<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/assets/img/favicon-16.png\">\n"
+              . "<link rel=\"apple-touch-icon\" href=\"/apple-touch-icon.png\">\n"
+              . "<link rel=\"manifest\" href=\"/site.webmanifest\">";
     return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -69,7 +73,7 @@ function _head(string $title, string $desc, string $canon, string $ogtype, strin
 <meta name="twitter:title" content="$t">
 <meta name="twitter:description" content="$d">
 <meta name="twitter:image" content="$img">
-<link rel="icon" href="$icon">
+$favicons
 <link rel="stylesheet" href="{{CSS}}assets/css/fonts.css">
 <link rel="stylesheet" href="{{CSS}}assets/css/style.css">
 $ldb</head>
