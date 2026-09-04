@@ -26,9 +26,13 @@ RewriteCond %{REQUEST_FILENAME}  !-d
 RewriteRule ^blog/.+            -  [G,L]
 
 # Legacy .html → clean folder URLs (root pages moved into folders)
-RewriteRule ^about\.html$    /about/    [R=301,L]
-RewriteRule ^contact\.html$  /contact/  [R=301,L]
-RewriteRule ^careers\.html$  /careers/  [R=301,L]
+RewriteRule ^about\.html$    /about-us/    [R=301,L]
+RewriteRule ^contact\.html$  /contact-us/  [R=301,L]
+RewriteRule ^careers\.html$  /careers/     [R=301,L]
+
+# Preserve the old working page URLs after the About/Contact rename
+RewriteRule ^about/?$    /about-us/    [R=301,L]
+RewriteRule ^contact/?$  /contact-us/  [R=301,L]
 
 # Drop .html from any direct request, keep the clean URL canonical
 RewriteCond %{THE_REQUEST} \s/+(.+)\.html[\s?] [NC]
