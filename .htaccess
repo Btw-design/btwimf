@@ -4,6 +4,7 @@
 
 Options -Indexes
 ErrorDocument 404 /404.html
+ErrorDocument 410 /410.html
 
 # Never serve dotfiles, config, samples, logs, JSON data, PHP includes
 <FilesMatch "(^\.|\.(sample\.php|log)$|composer\.(json|lock))">
@@ -16,6 +17,13 @@ RewriteEngine On
 RewriteRule ^_submissions(/.*)?$        - [F,L]
 RewriteRule ^_blog-data(/.*)?$          - [F,L]
 RewriteRule ^admin/(config|config\.sample|lib|render)\.php$ - [F,L]
+
+# Retired WordPress blog: only /blog/what-is-zero-depreciation-cover/ and
+# /blog/pet-insurance-india/ (and /blog/ itself) exist as real files and are
+# served normally. Every other /blog/<slug>/ is permanently gone -> 410.
+RewriteCond %{REQUEST_FILENAME}  !-f
+RewriteCond %{REQUEST_FILENAME}  !-d
+RewriteRule ^blog/.+            -  [G,L]
 
 # Legacy .html → clean folder URLs (root pages moved into folders)
 RewriteRule ^about\.html$    /about/    [R=301,L]
