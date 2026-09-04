@@ -19,8 +19,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // CONFIG  — edit these two lines for production
 // ─────────────────────────────────────────────────────────────────────────────
-const RECIPIENT   = 'info@btwimf.com';          // where leads are emailed
-const FROM_ADDR   = 'website@btwimf.com';       // must be a mailbox/alias on the domain
+const RECIPIENT   = 'insurance@btwimf.com, harshad@btwvisas.com, info@btwimf.com, leads@btwimf.com';  // notification recipients
+const FROM_ADDR   = 'leads@btwimf.com';        // authenticated Gmail relay account
 const SITE_NAME   = 'BTW IMF website';
 const STORE_DIR   = __DIR__ . '/_submissions';
 const MAX_PER_10MIN = 6;                        // per-IP rate limit
@@ -63,6 +63,20 @@ $FORMS = [
     'renewal'        => ['Policy renewal',         ['name', 'phone', 'email', 'type']],
     'quick-quote'    => ['Quick quote (quote bar)',['phone']],
     'vehicle-lookup' => ['Vehicle renewal lookup', ['vehreg']],
+];
+
+// ── Notification email copy: type => [heading, subject label] ───────────────
+// "heading" appears in the HTML email body; "subject" builds the inbox subject
+// line as "<subject> | BTW IMF Website". Falls back to the form's own label
+// (above) for any type not listed here, so nothing silently loses its subject.
+$EMAIL_COPY = [
+    'contact'        => ['New Contact Enquiry',        'New Contact Enquiry'],
+    'careers'        => ['New Job Application',        'New Job Application'],
+    'product-quote'  => ['New Product Quote Enquiry',  'New Product Quote Enquiry'],
+    'claim'          => ['New Claims Enquiry',          'New Claims Enquiry'],
+    'renewal'        => ['New Policy Renewal Enquiry',  'New Policy Renewal Enquiry'],
+    'quick-quote'    => ['New Quick Quote Enquiry',     'New Quick Quote Enquiry'],
+    'vehicle-lookup' => ['New Vehicle Renewal Lookup',  'New Vehicle Renewal Lookup'],
 ];
 
 $type = isset($_POST['_form']) ? preg_replace('/[^a-z\-]/', '', $_POST['_form']) : '';
@@ -158,27 +172,126 @@ $hits[] = $now;
 @file_put_contents($rlFile, json_encode($hits), LOCK_EX);
 
 // ── Email the office ───────────────────────────────────────────────────────
-$lines = ["New {$label} from the BTW IMF website", str_repeat('-', 48)];
+// Friendlier labels for known field keys; anything else falls back to a
+// title-cased version of the raw key (e.g. "vehreg" -> "Vehreg").
+$FIELD_LABELS = [
+    'name' => 'Name', 'phone' => 'Phone', 'email' => 'Email', 'topic' => 'Topic',
+    'message' => 'Message', 'city' => 'City', 'role' => 'Role', 'type' => 'Type',
+    'product' => 'Product', 'vehreg' => 'Vehicle Reg. No.',
+];
+function field_label($k, $FIELD_LABELS) {
+    if (isset($FIELD_LABELS[$k])) return $FIELD_LABELS[$k];
+    return ucwords(str_replace(['_', '-'], ' ', $k));
+}
+
+$receivedAt = date('d M Y, H:i');
+[$emailHeading, $subjectLabel] = $EMAIL_COPY[$type] ?? [$label, $label];
+$subject = $subjectLabel . ' | BTW IMF Website';
+
+// ── Plain-text part (kept for clients that don't render HTML) ───────────────
+$lines = [$emailHeading, str_repeat('-', 48)];
 foreach ($data as $k => $v) {
     if ($v === '') continue;
-    $lines[] = str_pad(ucfirst($k) . ':', 14) . $v;
+    $lines[] = str_pad(field_label($k, $FIELD_LABELS) . ':', 16) . $v;
 }
-if ($storedFile)         $lines[] = str_pad('Résumé file:', 14) . $storedFile;
-if (!empty($record['page'])) $lines[] = str_pad('Submitted on:', 14) . $record['page'];
-$lines[] = str_pad('Received:', 14) . date('d M Y, H:i');
-$lines[] = str_pad('IP:', 14) . $ip;
-$body = implode("\n", $lines) . "\n";
+if ($storedFile)             $lines[] = str_pad('Résumé file:', 16) . $storedFile;
+$lines[] = str_pad('Form type:', 16) . $label;
+if (!empty($record['page'])) $lines[] = str_pad('Source URL:', 16) . $record['page'];
+$lines[] = str_pad('Received:', 16) . $receivedAt;
+$lines[] = str_pad('IP:', 16) . $ip;
+$lines[] = '';
+$lines[] = 'BTW IMF - Insurance & Wealth Management';
+$lines[] = 'Website: https://btwimf.com';
+$textBody = implode("\n", $lines) . "\n";
+
+// ── HTML part — BTW IMF branded notification ────────────────────────────────
+function e($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); }
+
+$rowsHtml = '';
+$zebra = false;
+foreach ($data as $k => $v) {
+    if ($v === '') continue;
+    $zebra = !$zebra;
+    $bg = $zebra ? '#FAFBFE' : '#FFFFFF';
+    $rowsHtml .= '<tr style="background:' . $bg . ';">'
+        . '<td style="padding:11px 16px;border-bottom:1px solid #E3E9F2;font:600 13px/1.4 Arial,Helvetica,sans-serif;color:#182450;width:150px;vertical-align:top;white-space:nowrap;">' . e(field_label($k, $FIELD_LABELS)) . '</td>'
+        . '<td style="padding:11px 16px;border-bottom:1px solid #E3E9F2;font:400 13px/1.5 Arial,Helvetica,sans-serif;color:#0F1B33;word-break:break-word;">' . nl2br(e($v)) . '</td>'
+        . '</tr>';
+}
+if ($storedFile) {
+    $rowsHtml .= '<tr style="background:#FFFFFF;">'
+        . '<td style="padding:11px 16px;border-bottom:1px solid #E3E9F2;font:600 13px/1.4 Arial,Helvetica,sans-serif;color:#182450;width:150px;vertical-align:top;white-space:nowrap;">Résumé file</td>'
+        . '<td style="padding:11px 16px;border-bottom:1px solid #E3E9F2;font:400 13px/1.5 Arial,Helvetica,sans-serif;color:#0F1B33;word-break:break-word;">' . e($storedFile) . '</td>'
+        . '</tr>';
+}
+
+$metaHtml = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font:400 12.5px/1.7 Arial,Helvetica,sans-serif;color:#48566B;">'
+    . '<tr><td style="padding:2px 0;"><strong style="color:#182450;">Form type:</strong> ' . e($label) . '</td></tr>'
+    . '<tr><td style="padding:2px 0;"><strong style="color:#182450;">Received:</strong> ' . e($receivedAt) . '</td></tr>'
+    . (!empty($record['page']) ? '<tr><td style="padding:2px 0;word-break:break-all;"><strong style="color:#182450;">Source URL:</strong> ' . e($record['page']) . '</td></tr>' : '')
+    . '</table>';
+
+$logoUrl = 'https://btwimf.com/assets/img/btw-imf-logo.png';
+$htmlBody = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' . e($subject) . '</title></head>'
+. '<body style="margin:0;padding:0;background:#F5F7FC;">'
+. '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F5F7FC;padding:24px 12px;">'
+. '<tr><td align="center">'
+. '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:100%;background:#FFFFFF;border-radius:12px;overflow:hidden;border:1px solid #E3E9F2;">'
+
+// Header — navy, logo + brand name
+. '<tr><td style="background:#101A38;padding:28px 24px 22px;text-align:center;">'
+. '<img src="' . e($logoUrl) . '" width="150" alt="BTW IMF" style="display:block;margin:0 auto 12px;max-width:150px;height:auto;border:0;">'
+. '<div style="font:700 20px/1.2 Arial,Helvetica,sans-serif;color:#FFFFFF;letter-spacing:.3px;">BTW IMF</div>'
+. '<div style="font:400 12px/1.4 Arial,Helvetica,sans-serif;color:#B9C4E2;letter-spacing:.6px;text-transform:uppercase;margin-top:4px;">Insurance &amp; Wealth Management</div>'
+. '</td></tr>'
+
+// Accent bar — heading
+. '<tr><td style="background:#2F7A63;padding:14px 24px;">'
+. '<div style="font:700 16px/1.3 Arial,Helvetica,sans-serif;color:#FFFFFF;">' . e($emailHeading) . '</div>'
+. '</td></tr>'
+
+// Meta strip
+. '<tr><td style="padding:18px 24px 4px;">' . $metaHtml . '</td></tr>'
+
+// Details table
+. '<tr><td style="padding:14px 24px 22px;">'
+. '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #E3E9F2;border-radius:8px;overflow:hidden;">'
+. $rowsHtml
+. '</table>'
+. '</td></tr>'
+
+// Footer
+. '<tr><td style="background:#101A38;padding:18px 24px;text-align:center;">'
+. '<div style="font:600 12.5px/1.5 Arial,Helvetica,sans-serif;color:#FFFFFF;">BTW IMF &ndash; Insurance &amp; Wealth Management</div>'
+. '<div style="font:400 12px/1.6 Arial,Helvetica,sans-serif;color:#8FA0C5;">Website: <a href="https://btwimf.com" style="color:#7BBFA7;text-decoration:none;">https://btwimf.com</a></div>'
+. '</td></tr>'
+
+. '</table>'
+. '</td></tr>'
+. '</table>'
+. '</body></html>';
 
 $replyTo = filter_var($data['email'] ?? '', FILTER_VALIDATE_EMAIL) ?: FROM_ADDR;
-$subject = "[Website] {$label}" . (!empty($data['name']) ? ' — ' . header_safe($data['name']) : '');
+$boundary = 'btwimf-' . bin2hex(random_bytes(12));
 $headers = implode("\r\n", [
     'From: ' . SITE_NAME . ' <' . FROM_ADDR . '>',
     'Reply-To: ' . header_safe($replyTo),
     'X-Mailer: btwimf-form-handler',
-    'Content-Type: text/plain; charset=utf-8',
+    'MIME-Version: 1.0',
+    'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
 ]);
 
-$mailOk = @mail(RECIPIENT, header_safe($subject), $body, $headers, '-f' . FROM_ADDR);
+$mimeBody = "--{$boundary}\r\n"
+    . "Content-Type: text/plain; charset=utf-8\r\n"
+    . "Content-Transfer-Encoding: 8bit\r\n\r\n"
+    . $textBody . "\r\n\r\n"
+    . "--{$boundary}\r\n"
+    . "Content-Type: text/html; charset=utf-8\r\n"
+    . "Content-Transfer-Encoding: 8bit\r\n\r\n"
+    . $htmlBody . "\r\n\r\n"
+    . "--{$boundary}--";
+
+$mailOk = @mail(RECIPIENT, header_safe($subject), $mimeBody, $headers, '-f' . FROM_ADDR);
 
 // Success as long as we captured the lead somewhere.
 if ($logOk === false && !$mailOk) {
