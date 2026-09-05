@@ -63,7 +63,11 @@ command -v curl >/dev/null || die "curl not found."
 
 # ── guard rails ─────────────────────────────────────────────────────────────
 say "Pre-flight checks"
-LIVE_ROOTS="$(grep -rhoP 'DocumentRoot\s+\K\S+' /etc/apache2/sites-enabled/ 2>/dev/null | sort -u || true)"
+# -R (not -r): sites-enabled/ holds only symlinks to sites-available/, and
+# plain -r does not follow symlinks encountered during directory recursion
+# (only ones passed directly as arguments) — with -r this always matches
+# nothing and the check below would incorrectly refuse every real deploy.
+LIVE_ROOTS="$(grep -RhoP 'DocumentRoot\s+\K\S+' /etc/apache2/sites-enabled/ 2>/dev/null | sort -u || true)"
 grep -qxF "$DOCROOT" <<<"$LIVE_ROOTS" \
   || die "$DOCROOT is not an ENABLED site's DocumentRoot. This script is for redeploying the LIVE site only — use staging-setup.sh for a fresh/non-live docroot."
 [[ -d "$DOCROOT" ]] || die "$DOCROOT does not exist."

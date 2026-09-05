@@ -45,7 +45,13 @@ PORTS_SNIPPET="/etc/apache2/conf-available/${SITE_NAME}-listen.conf"
 
 # ── guard rails ─────────────────────────────────────────────────────────────
 say "Pre-flight checks"
-LIVE_ROOTS="$(grep -rhoP 'DocumentRoot\s+\K\S+' /etc/apache2/sites-enabled/ 2>/dev/null | sort -u || true)"
+# -R (not -r): sites-enabled/ holds only symlinks to sites-available/, and
+# plain -r does not follow symlinks encountered during directory recursion
+# (only ones passed directly as arguments) — with -r this always matched
+# nothing, so the "is this already a live site?" check below silently never
+# fired and this script could be pointed at an enabled (live) docroot without
+# being stopped.
+LIVE_ROOTS="$(grep -RhoP 'DocumentRoot\s+\K\S+' /etc/apache2/sites-enabled/ 2>/dev/null | sort -u || true)"
 if grep -qxF "$DOCROOT" <<<"$LIVE_ROOTS"; then
   die "$DOCROOT is already an ENABLED site's DocumentRoot. Refusing to touch it."
 fi
