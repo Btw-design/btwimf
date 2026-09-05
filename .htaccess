@@ -34,6 +34,13 @@ RewriteRule ^careers\.html$  /careers/     [R=301,L]
 RewriteRule ^about/?$    /about-us/    [R=301,L]
 RewriteRule ^contact/?$  /contact-us/  [R=301,L]
 
+# Canonicalize /index, /index/ and /index.html to the site root in one hop —
+# otherwise the extensionless-request rule below would happily serve
+# index.html at /index without redirecting (it's just another <slug>.html
+# match to it), and the .html-drop rule below would only get /index.html
+# halfway to /index instead of all the way to /.
+RewriteRule ^index(\.html)?/?$ / [R=301,L]
+
 # Drop .html from any direct request, keep the clean URL canonical
 RewriteCond %{THE_REQUEST} \s/+(.+)\.html[\s?] [NC]
 RewriteRule ^ /%1 [R=301,L]
