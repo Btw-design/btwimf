@@ -169,7 +169,7 @@
       .catch(function () {
         form.classList.remove('is-submitting');
         setLoading(btn, false);
-        showFormError(form, 'Network error — please check your connection and try again, or call us on 022 6930 2820.');
+        showFormError(form, 'Network error — please check your connection and try again, or call us on 022 4526 0380.');
       });
   }
 
