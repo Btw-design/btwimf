@@ -64,6 +64,42 @@ if ss -ltn 2>/dev/null | grep -q ":${PORT}\b"; then
 fi
 ok "No collision with live sites, docroot, vhost or port."
 
+# ── preserve Blog Admin / runtime content across a redeploy ─────────────────
+# These paths are server-side and git-ignored (see admin/README.md "Git /
+# deploy"): the tarball extracted below is a `git archive` of a commit, so it
+# never contains them. If $DOCROOT already has content (a redeploy, not a
+# first-time setup), snapshot these paths BEFORE the wipe and restore them
+# AFTER extraction, so a redeploy can never delete existing Blog Admin
+# articles, form submissions, or the admin password.
+#   - blogs/*/        : published article directories (NOT blogs/index.html —
+#                        that file stays the committed Git placeholder unless
+#                        the Blog Admin's own "Rebuild site" regenerates it)
+#   - _blog-data/      : Blog Admin's source-of-truth post data
+#   - assets/img/blog/ : uploaded post hero images
+#   - blogs/feed.xml   : generated RSS feed
+#   - admin/config.php : admin password hash
+#   - _submissions/    : saved form-handler.php leads
+PRESERVE_TMP=""
+if [[ -n "$BUNDLE" && -f "$BUNDLE" && -e "$DOCROOT" && -n "$(ls -A "$DOCROOT" 2>/dev/null || true)" ]]; then
+  say "Preserving existing Blog Admin / runtime content"
+  PRESERVE_TMP="$(mktemp -d)"
+  if [[ $DRY -eq 1 ]]; then
+    printf '  [dry-run] snapshot blogs/*/, _blog-data/, assets/img/blog/, blogs/feed.xml, admin/config.php, _submissions/ -> %s\n' "$PRESERVE_TMP"
+  else
+    if compgen -G "$DOCROOT/blogs/*/" > /dev/null; then
+      mkdir -p "$PRESERVE_TMP/blogs"
+      for d in "$DOCROOT"/blogs/*/; do cp -a "$d" "$PRESERVE_TMP/blogs/"; done
+    fi
+    for p in _blog-data assets/img/blog blogs/feed.xml admin/config.php _submissions; do
+      if [[ -e "$DOCROOT/$p" ]]; then
+        mkdir -p "$PRESERVE_TMP/$(dirname "$p")"
+        cp -a "$DOCROOT/$p" "$PRESERVE_TMP/$p"
+      fi
+    done
+  fi
+  ok "Snapshotted to $PRESERVE_TMP"
+fi
+
 # ── extract bundle ──────────────────────────────────────────────────────────
 say "Deploying files to $DOCROOT"
 if [[ -n "$BUNDLE" && -f "$BUNDLE" ]]; then
@@ -75,6 +111,24 @@ elif [[ -f "$DOCROOT/index.html" ]]; then
   warn "No bundle given; using files already in $DOCROOT."
 else
   die "No bundle passed and $DOCROOT has no index.html. Pass the tar.gz as arg 1."
+fi
+
+# ── restore preserved Blog Admin / runtime content ──────────────────────────
+if [[ -n "$PRESERVE_TMP" ]]; then
+  say "Restoring preserved Blog Admin / runtime content"
+  if [[ $DRY -eq 1 ]]; then
+    printf '  [dry-run] restore from %s (blogs/index.html left as the Git placeholder)\n' "$PRESERVE_TMP"
+  else
+    [[ -d "$PRESERVE_TMP/blogs" ]] && cp -a "$PRESERVE_TMP/blogs/." "$DOCROOT/blogs/"
+    for p in _blog-data assets/img/blog blogs/feed.xml admin/config.php _submissions; do
+      if [[ -e "$PRESERVE_TMP/$p" ]]; then
+        mkdir -p "$DOCROOT/$(dirname "$p")"
+        cp -a "$PRESERVE_TMP/$p" "$DOCROOT/$p"
+      fi
+    done
+    rm -rf "$PRESERVE_TMP"
+  fi
+  ok "Restored — blogs/index.html stayed the Git version (Blog Admin's Rebuild can still regenerate it live)"
 fi
 
 # ── runtime-writable dirs (server-managed content) ──────────────────────────
