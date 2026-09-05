@@ -22,9 +22,15 @@ Blog Admin content**:
 - `_submissions/` — saved form-handler.php leads
 
 `blogs/index.html` is **not** carried forward — it always comes from the
-new commit (it's the committed Git placeholder). Only the Blog Admin's own
-**"Rebuild site"** button, run live after the deploy, regenerates it from
-`_blog-data/`.
+new commit (it's the committed Git placeholder). But both scripts then
+**automatically** run the exact same `publish_all()` function Blog Admin's
+own "Rebuild site" button calls (as the web user, no login needed since it's
+invoked server-side) to regenerate `blogs/index.html`, `sitemap.xml` (blog
+entries only — everything else in it is untouched) and `blogs/feed.xml` from
+the just-restored `_blog-data/`. **No manual "Rebuild site" click is required
+after a deploy** — the blog listing is never left stale. On `deploy-live.sh`
+this rebuild runs before the atomic swap, on the staged new tree: if it fails,
+the deploy aborts there and the live site is untouched.
 
 Neither script uses `rsync --delete` or `git clean`, and neither ever deletes
 the previous deployment — `deploy-live.sh` renames the old docroot aside
@@ -58,6 +64,8 @@ backups, or DNS.
   `git archive --format=tar.gz -o btwimf-<hash>.tar.gz <commit>` — or ask for it).
 - Apache 2.4 already running; PHP for Apache (`libapache2-mod-php php-mbstring`)
   — the script warns if PHP is missing.
+- **PHP CLI** on the box (usually already present alongside `libapache2-mod-php`)
+  — both scripts now require it to auto-rebuild the blog listing/sitemap/feed.
 
 ## Run it
 

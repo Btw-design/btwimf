@@ -23,9 +23,14 @@
 #       - admin/config.php   (admin password hash)
 #       - _submissions/      (saved form-handler.php leads)
 #   • the committed blogs/index.html is NOT carried forward — it stays the
-#     Git version from the new commit. Only the Blog Admin's own live
-#     "Rebuild site" action (a runtime step, unrelated to this script)
-#     regenerates it afterward.
+#     Git version from the new commit, but this script then AUTOMATICALLY
+#     runs Blog Admin's own "Rebuild site" function (publish_all(), from
+#     admin/render.php) as the web user, before the swap, so blogs/index.html,
+#     sitemap.xml (blog entries only) and blogs/feed.xml are regenerated from
+#     the just-restored _blog-data/ — no manual "Rebuild site" click needed,
+#     and the live site is never shown a stale blog listing after a deploy.
+#     If this rebuild fails, the deploy aborts before the swap — the current
+#     live site is left completely untouched.
 #   • aborts if $DOCROOT is not already an enabled Apache site (use
 #     staging-setup.sh for a brand-new / non-live deploy instead)
 #
@@ -60,6 +65,7 @@ die() { printf '\n\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 [[ $EUID -eq 0 ]] || die "Run with sudo (need to chown/reload apache)."
 command -v apache2 >/dev/null || die "apache2 not found."
 command -v curl >/dev/null || die "curl not found."
+command -v php >/dev/null || die "php (CLI) not found — required to auto-rebuild Blog Admin pages (publish_all())."
 
 # ── guard rails ─────────────────────────────────────────────────────────────
 say "Pre-flight checks"
@@ -123,6 +129,22 @@ run "mkdir -p '$NEW_DIR/_submissions' '$NEW_DIR/_blog-data' '$NEW_DIR/assets/img
 run "chmod 775 '$NEW_DIR/_submissions' '$NEW_DIR/_blog-data' '$NEW_DIR/assets/img/blog' '$NEW_DIR/admin'"
 ok "Owned by ${WEB_USER}; dirs 755 / files 644; runtime dirs + admin/ group-writable"
 
+# ── auto-rebuild Blog Admin generated pages from the preserved _blog-data/ ──
+# Runs the exact same publish_all() function Blog Admin's own "Rebuild site"
+# button calls (admin/render.php), as $WEB_USER, directly on the staged new
+# tree — BEFORE the swap, so a failure here aborts with the live site still
+# fully intact. Regenerates blogs/index.html, sitemap.xml (blog entries only,
+# via update_sitemap()'s targeted replace — nothing else in it is touched),
+# and blogs/feed.xml, all from the _blog-data/ this run just carried forward.
+say "Auto-rebuilding Blog Admin pages (blogs/index.html, sitemap.xml, blogs/feed.xml)"
+REBUILD_CMD="sudo -u '$WEB_USER' php -r \"require '$NEW_DIR/admin/render.php'; publish_all(); echo 'rebuilt ' . count(published_posts()) . ' post(s)' . PHP_EOL;\""
+if [[ $DRY -eq 1 ]]; then
+  printf '  [dry-run] %s\n' "$REBUILD_CMD"
+else
+  eval "$REBUILD_CMD" || die "Blog Admin rebuild (publish_all) failed — aborting before swap. The current live site is untouched."
+fi
+ok "Blog listing / sitemap / feed regenerated from preserved _blog-data/"
+
 # ── sanity check before the swap ────────────────────────────────────────────
 say "Sanity-checking the new tree"
 run "test -f '$NEW_DIR/index.html'" || die "New tree has no index.html — aborting before swap."
@@ -156,6 +178,8 @@ cat <<EOF
  Verify:
    - Spot-check a page or two on the live site.
    - Check that existing /blogs/<slug>/ articles still 200 (not 404).
+   - /blogs/ should already show every published post — this run auto-ran
+     Blog Admin's rebuild, no manual "Rebuild site" click needed.
    - If you published new blog posts SINCE this deploy started, they were
      NOT part of this run's carry-forward (it snapshotted at deploy time) —
      verify those are still present, and if not, restore from ${OLD_DIR}.

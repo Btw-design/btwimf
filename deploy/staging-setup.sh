@@ -40,6 +40,7 @@ die() { printf '\n\033[1;31m✗ %s\033[0m\n' "$*" >&2; exit 1; }
 
 [[ $EUID -eq 0 ]] || die "Run with sudo (need to write vhost + reload apache)."
 command -v apache2 >/dev/null || die "apache2 not found."
+command -v php >/dev/null || die "php (CLI) not found — required to auto-rebuild Blog Admin pages (publish_all())."
 VHOST_FILE="/etc/apache2/sites-available/${SITE_NAME}.conf"
 PORTS_SNIPPET="/etc/apache2/conf-available/${SITE_NAME}-listen.conf"
 
@@ -78,8 +79,8 @@ ok "No collision with live sites, docroot, vhost or port."
 # AFTER extraction, so a redeploy can never delete existing Blog Admin
 # articles, form submissions, or the admin password.
 #   - blogs/*/        : published article directories (NOT blogs/index.html —
-#                        that file stays the committed Git placeholder unless
-#                        the Blog Admin's own "Rebuild site" regenerates it)
+#                        that file is the committed Git placeholder until the
+#                        auto-rebuild step further down regenerates it)
 #   - _blog-data/      : Blog Admin's source-of-truth post data
 #   - assets/img/blog/ : uploaded post hero images
 #   - blogs/feed.xml   : generated RSS feed
@@ -134,7 +135,7 @@ if [[ -n "$PRESERVE_TMP" ]]; then
     done
     rm -rf "$PRESERVE_TMP"
   fi
-  ok "Restored — blogs/index.html stayed the Git version (Blog Admin's Rebuild can still regenerate it live)"
+  ok "Restored — blogs/index.html still the Git placeholder here; the auto-rebuild step below fixes it"
 fi
 
 # ── runtime-writable dirs (server-managed content) ──────────────────────────
@@ -151,6 +152,22 @@ run "find '$DOCROOT' -type d -exec chmod 755 {} +"
 run "find '$DOCROOT' -type f -exec chmod 644 {} +"
 run "chmod 775 '$DOCROOT/_submissions' '$DOCROOT/_blog-data' '$DOCROOT/assets/img/blog' '$DOCROOT/admin'"
 ok "Owned by ${WEB_USER}; dirs 755 / files 644; runtime dirs + admin/ group-writable"
+
+# ── auto-rebuild Blog Admin generated pages from the preserved _blog-data/ ──
+# Runs the exact same publish_all() function Blog Admin's own "Rebuild site"
+# button calls (admin/render.php), as $WEB_USER. Regenerates blogs/index.html,
+# sitemap.xml (blog entries only — everything else in it is left alone), and
+# blogs/feed.xml from whatever is in _blog-data/ (empty on a first-time setup,
+# or the just-restored posts on a redeploy) — no manual "Rebuild site" click
+# needed either way.
+say "Auto-rebuilding Blog Admin pages (blogs/index.html, sitemap.xml, blogs/feed.xml)"
+REBUILD_CMD="sudo -u '$WEB_USER' php -r \"require '$DOCROOT/admin/render.php'; publish_all(); echo 'rebuilt ' . count(published_posts()) . ' post(s)' . PHP_EOL;\""
+if [[ $DRY -eq 1 ]]; then
+  printf '  [dry-run] %s\n' "$REBUILD_CMD"
+else
+  eval "$REBUILD_CMD" || warn "Blog Admin rebuild (publish_all) failed — blogs/index.html may be the Git placeholder. Check admin/config.php exists and PHP can read _blog-data/."
+fi
+ok "Blog listing / sitemap / feed regenerated"
 
 # ── apache modules ──────────────────────────────────────────────────────────
 say "Enabling Apache modules (rewrite headers deflate expires)"
