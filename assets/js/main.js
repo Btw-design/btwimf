@@ -125,6 +125,23 @@
     }
   );
 
+  /* ── Mobile number fields: exactly 10 digits, digits only ──
+     Every phone field on the site takes a bare 10-digit Indian mobile
+     number. As the user types (or pastes), strip non-digits and cap the
+     length at 10, so it is impossible to enter more or fewer than 10
+     digits. Each form's submit handler additionally rejects anything that
+     is not exactly 10. */
+  Array.prototype.forEach.call(
+    document.querySelectorAll('input[name="phone"]'),
+    function (el) {
+      el.setAttribute('maxlength', '10');
+      el.addEventListener('input', function () {
+        var d = el.value.replace(/\D/g, '').slice(0, 10);
+        if (d !== el.value) el.value = d;
+      });
+    }
+  );
+
   function setLoading(btn, on) {
     if (!btn) return;
     if (on) { btn.setAttribute('data-loading', '1'); btn.setAttribute('aria-busy', 'true'); btn.disabled = true; }
@@ -180,7 +197,7 @@
       e.preventDefault();
       var input = qbForm.querySelector('input[name="phone"]');
       var digits = (input.value || '').replace(/\D/g, '');
-      if (digits.length < 10) {
+      if (digits.length !== 10) {
         input.style.borderColor = '#E06B6B';
         input.focus();
         return;
@@ -473,7 +490,7 @@
       var topic = cForm.querySelector('#cf-topic');
       var bad = null;
       if (!name.value.trim()) { name.classList.add('is-invalid'); bad = bad || name; }
-      if ((phone.value || '').replace(/\D/g, '').length < 10) { phone.classList.add('is-invalid'); bad = bad || phone; }
+      if ((phone.value || '').replace(/\D/g, '').length !== 10) { phone.classList.add('is-invalid'); bad = bad || phone; }
       if (!emailRx.test(email.value.trim())) { email.classList.add('is-invalid'); bad = bad || email; }
       if (!topic.value) { topic.classList.add('is-invalid'); bad = bad || topic; }
       if (bad) { bad.focus(); return; }
@@ -515,7 +532,7 @@
       };
       var bad = null;
       if (!f.name.value.trim()) { f.name.classList.add('is-invalid'); bad = bad || f.name; }
-      if ((f.phone.value || '').replace(/\D/g, '').length < 10) { f.phone.classList.add('is-invalid'); bad = bad || f.phone; }
+      if ((f.phone.value || '').replace(/\D/g, '').length !== 10) { f.phone.classList.add('is-invalid'); bad = bad || f.phone; }
       if (!jEmailRx.test(f.email.value.trim())) { f.email.classList.add('is-invalid'); bad = bad || f.email; }
       if (!f.city.value.trim()) { f.city.classList.add('is-invalid'); bad = bad || f.city; }
       if (!f.role.value) { f.role.classList.add('is-invalid'); bad = bad || f.role; }
@@ -556,7 +573,7 @@
           em = pForm.querySelector('#pcf-email');
       var bad = null;
       if (!n.value.trim()) { n.classList.add('is-invalid'); bad = bad || n; }
-      if ((ph.value || '').replace(/\D/g, '').length < 10) { ph.classList.add('is-invalid'); bad = bad || ph; }
+      if ((ph.value || '').replace(/\D/g, '').length !== 10) { ph.classList.add('is-invalid'); bad = bad || ph; }
       if (!pEmailRx.test(em.value.trim())) { em.classList.add('is-invalid'); bad = bad || em; }
       if (bad) { bad.focus(); return; }
 
@@ -594,7 +611,7 @@
           ty = clForm.querySelector('#clf-type');
       var bad = null;
       if (!n.value.trim()) { n.classList.add('is-invalid'); bad = bad || n; }
-      if ((ph.value || '').replace(/\D/g, '').length < 10) { ph.classList.add('is-invalid'); bad = bad || ph; }
+      if ((ph.value || '').replace(/\D/g, '').length !== 10) { ph.classList.add('is-invalid'); bad = bad || ph; }
       if (!clEmailRx.test(em.value.trim())) { em.classList.add('is-invalid'); bad = bad || em; }
       if (!ty.value) { ty.classList.add('is-invalid'); bad = bad || ty; }
       if (bad) { bad.focus(); return; }
@@ -633,7 +650,7 @@
           ty = rnForm.querySelector('#rnf-type');
       var bad = null;
       if (!n.value.trim()) { n.classList.add('is-invalid'); bad = bad || n; }
-      if ((ph.value || '').replace(/\D/g, '').length < 10) { ph.classList.add('is-invalid'); bad = bad || ph; }
+      if ((ph.value || '').replace(/\D/g, '').length !== 10) { ph.classList.add('is-invalid'); bad = bad || ph; }
       if (!rnEmailRx.test(em.value.trim())) { em.classList.add('is-invalid'); bad = bad || em; }
       if (!ty.value) { ty.classList.add('is-invalid'); bad = bad || ty; }
       if (bad) { bad.focus(); return; }

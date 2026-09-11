@@ -336,7 +336,7 @@
         <button type="button" class="pill">Mutual Funds</button>
       </div>
       <form class="qb-form" novalidate>
-        <input type="tel" name="phone" inputmode="tel" placeholder="Mobile number" aria-label="Mobile number" required>
+        <input type="tel" name="phone" inputmode="tel" placeholder="Mobile number" aria-label="Mobile number" maxlength="10" pattern="[0-9]{10}" required>
         <button class="btn btn-navy" type="submit">Get My Free Quote</button>
       </form>
     </div>
@@ -856,7 +856,7 @@
           </div>
           <div class="field">
             <label for="cf-phone">Mobile number <span class="req" aria-hidden="true">*</span></label>
-            <input type="tel" id="cf-phone" name="phone" inputmode="tel" autocomplete="tel" maxlength="14" required>
+            <input type="tel" id="cf-phone" name="phone" inputmode="tel" autocomplete="tel" maxlength="10" pattern="[0-9]{10}" required>
           </div>
           <div class="field full">
             <label for="cf-email">Email address <span class="req" aria-hidden="true">*</span></label>
