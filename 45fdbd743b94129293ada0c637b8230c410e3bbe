@@ -1,0 +1,1 @@
+Label clarification: despite the 'WIP (branch only)' title, this commit is part of the Email OTP + Turnstile release that was tested and deployed to production on 2026-09-21 (final deployed commit: d087308). History intentionally not rewritten.
