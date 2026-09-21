@@ -1777,3 +1777,9 @@ form .otp-box .btn.otp-btn:disabled{opacity:.6;cursor:not-allowed;transform:none
   .otp-row .otp-btn{flex:1 1 auto}
   .field input.otp-input{flex:1 1 100%;width:100%}
 }
+
+
+/* Careers — six-step hiring process */
+.step-grid.step-grid-6{grid-template-columns:repeat(3,1fr)}
+@media (max-width:1080px){.step-grid.step-grid-6{grid-template-columns:1fr 1fr}}
+@media (max-width:620px){.step-grid.step-grid-6{grid-template-columns:1fr}}
