@@ -1759,7 +1759,6 @@ form .otp-box .btn.otp-btn:disabled{opacity:.6;cursor:not-allowed;transform:none
 .field input.otp-input{width:9.5em;max-width:100%;padding:12px 14px;font-size:20px;font-weight:700;letter-spacing:.32em;text-align:center;font-variant-numeric:tabular-nums}
 .otp-input::placeholder{letter-spacing:.2em;font-weight:400;color:#B8C2D6}
 .otp-verified{display:inline-flex;align-items:center;gap:8px;font-size:14.5px;font-weight:700;color:var(--accent-700)}
-.otp-verified svg{width:20px;height:20px;flex:none;padding:3px;border-radius:50%;background:var(--accent-050);fill:none;stroke:var(--accent-700);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 .otp-link{background:none;border:0;padding:4px 2px;font:700 13px/1.2 var(--font-b);color:var(--primary);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .otp-link:hover{color:var(--primary-600)}
 .otp-link:disabled{color:#8A97AD;text-decoration:none;cursor:default}

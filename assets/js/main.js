@@ -223,7 +223,7 @@
       '<div class="otp-box" role="group" aria-label="Email verification">' +
         '<div class="otp-row otp-top">' +
           '<button type="button" class="btn btn-outline-dark btn-sm otp-btn otp-send">Send OTP</button>' +
-          '<span class="otp-verified" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>Email Verified &#10003;</span>' +
+          '<span class="otp-verified" hidden>Email Verified &#10003;</span>' +
           '<button type="button" class="otp-link otp-change" hidden>Change email</button>' +
         '</div>' +
         '<div class="otp-entry" hidden>' +

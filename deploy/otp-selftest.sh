@@ -64,7 +64,7 @@ try: print(json.load(sys.stdin).get(sys.argv[1],""))
 except Exception: print("")' "$1"; }
 newjar() { JAR="$T/jar-$RANDOM$RANDOM"; CSRF="$(curl -s -c "$JAR" -H "$ORIGIN" "$BASE/otp-api.php?a=init" | jget csrf)"; }
 api()  { curl -s -b "$JAR" -c "$JAR" -H "$ORIGIN" -H "X-CSRF-Token: $CSRF" "$@" "$BASE/otp-api.php"; }
-send_otp() { api -F a=send -F "form=${3:-contact}" -F "email=$1" -F "name=${2:-Test User}" -F "_cft=$TOKEN"; }
+send_otp() { api -F a=send -F "form=${3:-contact}" --form-string "email=$1" --form-string "name=${2:-Test User}" -F "_cft=$TOKEN"; }
 verify_otp() { api -F a=verify -F "otp=$1"; }
 last_otp() { local f; f="$(ls -1t "$T"/mail/*.eml 2>/dev/null | head -1)"; [[ -n "$f" ]] && grep -o 'code is: [0-9]\{6\}' "$f" | head -1 | grep -o '[0-9]\{6\}'; }
 mails() { ls -1 "$T"/mail/*.eml 2>/dev/null | wc -l; }
