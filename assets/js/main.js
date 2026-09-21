@@ -142,6 +142,223 @@
     }
   );
 
+  /* ── Cloudflare Turnstile + Email OTP ───────────────────────────────
+     • Turnstile guards quick-quote, vehicle lookup and careers.
+     • Email OTP guards contact / partner, product-quote, claims, renewals and
+       careers: the submit button stays disabled until the visitor verifies the
+       OTP e-mailed to them. All checks are repeated server-side
+       (otp-api.php + form-handler.php), so this UI cannot be used to bypass
+       them. The public Turnstile site key is served by otp-api.php — it is
+       configured on the server, not in this file. */
+  var OTP_API = '/otp-api.php';
+  var otpBoot = null, tsLoad = null;
+
+  function otpInit() {
+    if (!otpBoot) {
+      otpBoot = fetch(OTP_API + '?a=init', { credentials: 'same-origin', cache: 'no-store', headers: { 'X-Requested-With': 'fetch' } })
+        .then(function (r) { return r.json(); })
+        .then(function (j) { if (!j || !j.ok) throw new Error('init'); return j; })
+        .catch(function (e) { otpBoot = null; throw e; });
+    }
+    return otpBoot;
+  }
+  function loadTurnstile() {
+    if (!tsLoad) {
+      tsLoad = new Promise(function (resolve, reject) {
+        if (window.turnstile) { resolve(window.turnstile); return; }
+        var sc = document.createElement('script');
+        sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+        sc.async = true; sc.defer = true;
+        sc.onload = function () { window.turnstile ? resolve(window.turnstile) : reject(new Error('ts')); };
+        sc.onerror = function () { reject(new Error('ts')); };
+        document.head.appendChild(sc);
+      }).catch(function (e) { tsLoad = null; throw e; });
+    }
+    return tsLoad;
+  }
+  /* Resolves with a fresh single-use Turnstile token. The widget is invisible
+     unless Cloudflare needs the visitor to interact. */
+  function getTurnstileToken(host) {
+    return Promise.all([otpInit(), loadTurnstile()]).then(function (r) {
+      var siteKey = r[0].siteKey, ts = r[1];
+      if (!siteKey) throw new Error('nokey');
+      return new Promise(function (resolve, reject) {
+        var box = document.createElement('div');
+        box.className = 'ts-box';
+        host.appendChild(box);
+        var wid = null, settled = false;
+        function cleanup() {
+          try { if (wid !== null) ts.remove(wid); } catch (e) {}
+          if (box.parentNode) box.parentNode.removeChild(box);
+        }
+        function fail() { if (!settled) { settled = true; cleanup(); reject(new Error('ts')); } }
+        wid = ts.render(box, {
+          sitekey: siteKey, appearance: 'interaction-only', theme: 'light',
+          callback: function (t) { if (!settled) { settled = true; cleanup(); resolve(t); } },
+          'error-callback': fail, 'timeout-callback': fail
+        });
+      });
+    });
+  }
+  var TS_ERROR = 'The security check could not be completed. Please refresh the page and try again.';
+
+  var OTP_TYPES = { 'contact-form': 'contact', 'careers-form': 'careers', 'pcf': 'product-quote', 'claim-form': 'claim', 'renew-form': 'renewal' };
+  var otpSeq = 0;
+  var MAIL_RX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function initOtp(form, type) {
+    var emailEl = form.querySelector('input[name="email"]');
+    var nameEl = form.querySelector('input[name="name"]');
+    var submitBtn = form.querySelector('[type="submit"]');
+    var anchor = emailEl && emailEl.closest('.field');
+    if (!emailEl || !submitBtn || !anchor) return;
+    /* half-width e-mail field (careers): place the OTP row after its row partner */
+    var nx = anchor.nextElementSibling;
+    if (!anchor.classList.contains('full') && nx && nx.classList.contains('field') && !nx.classList.contains('full')) anchor = nx;
+
+    var n = ++otpSeq;
+    var wrap = document.createElement('div');
+    wrap.className = 'field full otp-field';
+    wrap.innerHTML =
+      '<div class="otp-box" role="group" aria-label="Email verification">' +
+        '<div class="otp-row otp-top">' +
+          '<button type="button" class="btn btn-outline-dark btn-sm otp-btn otp-send">Send OTP</button>' +
+          '<span class="otp-verified" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>Email Verified &#10003;</span>' +
+          '<button type="button" class="otp-link otp-change" hidden>Change email</button>' +
+        '</div>' +
+        '<div class="otp-entry" hidden>' +
+          '<label for="otpcode' + n + '">Enter OTP</label>' +
+          '<div class="otp-row">' +
+            '<input type="text" id="otpcode' + n + '" class="otp-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="------" aria-describedby="otpmsg' + n + '">' +
+            '<button type="button" class="btn btn-navy btn-sm otp-btn otp-verify">Verify OTP</button>' +
+            '<button type="button" class="otp-link otp-resend" disabled>Resend OTP</button>' +
+          '</div>' +
+        '</div>' +
+        '<p class="otp-msg" id="otpmsg' + n + '" role="status" aria-live="polite"></p>' +
+      '</div>';
+    anchor.parentNode.insertBefore(wrap, anchor.nextSibling);
+
+    var box = wrap.querySelector('.otp-box');
+    var sendBtn = wrap.querySelector('.otp-send'), verBadge = wrap.querySelector('.otp-verified');
+    var changeBtn = wrap.querySelector('.otp-change'), entry = wrap.querySelector('.otp-entry');
+    var codeEl = wrap.querySelector('.otp-input'), verifyBtn = wrap.querySelector('.otp-verify');
+    var resendBtn = wrap.querySelector('.otp-resend'), msg = wrap.querySelector('.otp-msg');
+    var verified = false, sentTo = '', timer = null;
+
+    function say(text, kind) { msg.textContent = text || ''; msg.className = 'otp-msg' + (kind ? ' is-' + kind : ''); }
+    function normEmail() { return (emailEl.value || '').trim().toLowerCase(); }
+    function gate(on) {
+      submitBtn.disabled = on;
+      submitBtn.classList.toggle('otp-gated', on);
+      if (on) submitBtn.setAttribute('aria-disabled', 'true'); else submitBtn.removeAttribute('aria-disabled');
+    }
+    function stopTimer() { if (timer) { clearInterval(timer); timer = null; } }
+    function cooldown(sec) {
+      stopTimer();
+      var left = Math.max(1, sec | 0);
+      resendBtn.disabled = true;
+      function paint() { resendBtn.textContent = left > 0 ? 'Resend OTP in ' + left + 's' : 'Resend OTP'; }
+      paint();
+      timer = setInterval(function () {
+        left--; paint();
+        if (left <= 0) { stopTimer(); resendBtn.disabled = false; }
+      }, 1000);
+    }
+    function reset(note) {
+      verified = false; sentTo = ''; form.__otpToken = null; stopTimer();
+      emailEl.readOnly = false; emailEl.removeAttribute('aria-readonly');
+      verBadge.hidden = true; changeBtn.hidden = true; entry.hidden = true;
+      sendBtn.hidden = false; sendBtn.disabled = false; codeEl.value = '';
+      resendBtn.disabled = true; resendBtn.textContent = 'Resend OTP';
+      gate(true);
+      say(note || 'Verify your email address to enable Submit.');
+    }
+    form.__otpReset = function () { reset('Please verify your email address with a new OTP.'); };
+
+    function api(action, fields) {
+      return otpInit().then(function (boot) {
+        var fd = new FormData();
+        fd.append('a', action);
+        Object.keys(fields).forEach(function (k) { fd.append(k, fields[k]); });
+        return fetch(OTP_API, { method: 'POST', body: fd, credentials: 'same-origin', headers: { 'X-Requested-With': 'fetch', 'X-CSRF-Token': boot.csrf } })
+          .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { j.__status = r.status; return j; }); });
+      });
+    }
+
+    function send() {
+      var em = normEmail();
+      if (!MAIL_RX.test(em)) {
+        emailEl.classList.add('is-invalid'); emailEl.focus();
+        say('Please enter a valid email address.', 'err');
+        return;
+      }
+      sendBtn.disabled = true; resendBtn.disabled = true;
+      say('Sending OTP…');
+      getTurnstileToken(box).then(function (tok) {
+        return api('send', { form: type, email: em, name: nameEl ? nameEl.value : '', _cft: tok });
+      }).then(function (j) {
+        if (j && j.ok) {
+          sentTo = em;
+          sendBtn.hidden = true; entry.hidden = false; codeEl.value = '';
+          say('OTP has been sent to your email address.', 'ok');
+          cooldown(j.cooldown || 60);
+          codeEl.focus();
+        } else {
+          sendBtn.disabled = false;
+          if (j && j.pending) { sentTo = em; sendBtn.hidden = true; entry.hidden = false; }
+          if (j && j.retry) cooldown(j.retry); else resendBtn.disabled = entry.hidden;
+          say((j && j.error) || 'We could not send the OTP right now. Please try again.', 'err');
+        }
+      }).catch(function () {
+        sendBtn.disabled = false; resendBtn.disabled = entry.hidden;
+        say(TS_ERROR, 'err');
+      });
+    }
+
+    function verify() {
+      var code = (codeEl.value || '').replace(/\s+/g, '');
+      if (!/^\d{6}$/.test(code)) { say('Invalid OTP. Please check the OTP and try again.', 'err'); codeEl.focus(); return; }
+      verifyBtn.disabled = true;
+      api('verify', { otp: code }).then(function (j) {
+        verifyBtn.disabled = false;
+        if (j && j.ok && j.token) {
+          verified = true; form.__otpToken = j.token; stopTimer();
+          entry.hidden = true; sendBtn.hidden = true;
+          verBadge.hidden = false; changeBtn.hidden = false;
+          emailEl.readOnly = true; emailEl.setAttribute('aria-readonly', 'true');
+          say('');
+          gate(false);
+        } else {
+          say((j && j.error) || 'Invalid OTP. Please check the OTP and try again.', 'err');
+          if (j && (j.expired || j.locked)) { codeEl.value = ''; }
+          codeEl.focus();
+        }
+      }).catch(function () { verifyBtn.disabled = false; say('Network error — please try again.', 'err'); });
+    }
+
+    sendBtn.addEventListener('click', send);
+    resendBtn.addEventListener('click', function () { if (!resendBtn.disabled) send(); });
+    verifyBtn.addEventListener('click', verify);
+    changeBtn.addEventListener('click', function () { reset(); emailEl.focus(); });
+    codeEl.addEventListener('input', function () { codeEl.value = codeEl.value.replace(/\D/g, '').slice(0, 6); });
+    codeEl.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); verify(); } });
+    emailEl.addEventListener('input', function () {
+      if ((verified || sentTo) && normEmail() !== sentTo) reset('Email changed — please verify the new address.');
+    });
+    /* Capture-phase guard: even Enter-key submits are stopped until verified. */
+    form.addEventListener('submit', function (e) {
+      if (verified && form.__otpToken) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      say('Please verify your email with the OTP before submitting.', 'err');
+      (sendBtn.hidden ? codeEl : sendBtn).focus();
+    }, true);
+
+    reset();
+  }
+  Object.keys(OTP_TYPES).forEach(function (cls) {
+    Array.prototype.forEach.call(document.querySelectorAll('.' + cls), function (f) { initOtp(f, OTP_TYPES[cls]); });
+  });
+
   function setLoading(btn, on) {
     if (!btn) return;
     if (on) { btn.setAttribute('data-loading', '1'); btn.setAttribute('aria-busy', 'true'); btn.disabled = true; }
@@ -167,27 +384,40 @@
     fd.append('_ts', String(window.__formTs));
     fd.append('_page', location.href);
     if (extra) Object.keys(extra).forEach(function (k) { fd.set(k, extra[k]); });
+    if (form.__otpToken) fd.set('_otp_token', form.__otpToken);
     var old = form.querySelector('.form-error'); if (old) old.parentNode.removeChild(old);
     form.classList.add('is-submitting');
     setLoading(btn, true);
-    fetch(FORM_ENDPOINT, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'fetch' } })
-      .then(function (r) {
-        return r.text().then(function (t) {
-          var j = {}; try { j = JSON.parse(t); } catch (e) {}
-          return { ok: r.ok, j: j };
+    function post() {
+      fetch(FORM_ENDPOINT, { method: 'POST', body: fd, credentials: 'same-origin', headers: { 'X-Requested-With': 'fetch' } })
+        .then(function (r) {
+          return r.text().then(function (t) {
+            var j = {}; try { j = JSON.parse(t); } catch (e) {}
+            return { ok: r.ok, j: j };
+          });
+        })
+        .then(function (res) {
+          form.classList.remove('is-submitting');
+          setLoading(btn, false);
+          if (res.j && res.j.ok === true) { onSuccess(); }
+          else {
+            if (res.j && res.j.code === 'otp_required' && form.__otpReset) form.__otpReset();
+            showFormError(form, (res.j && res.j.error) || 'We could not send your request just now. Please try again, or call / WhatsApp us on 90043 83987.');
+          }
+        })
+        .catch(function () {
+          form.classList.remove('is-submitting');
+          setLoading(btn, false);
+          showFormError(form, 'Network error — please check your connection and try again, or call us on 022 4526 0380.');
         });
-      })
-      .then(function (res) {
+    }
+    if (type === 'careers' || type === 'quick-quote') {
+      getTurnstileToken(form).then(function (tok) { fd.set('_cft', tok); post(); }).catch(function () {
         form.classList.remove('is-submitting');
         setLoading(btn, false);
-        if (res.j && res.j.ok === true) { onSuccess(); }
-        else { showFormError(form, (res.j && res.j.error) || 'We could not send your request just now. Please try again, or call / WhatsApp us on 90043 83987.'); }
-      })
-      .catch(function () {
-        form.classList.remove('is-submitting');
-        setLoading(btn, false);
-        showFormError(form, 'Network error — please check your connection and try again, or call us on 022 4526 0380.');
+        showFormError(form, TS_ERROR);
       });
+    } else { post(); }
   }
 
   /* ── Quote bar: phone form ────────────────────── */
@@ -244,7 +474,10 @@
       fd.append('_ts', String(window.__formTs));
       fd.append('_page', location.href);
       fd.append('vehreg', v);
-      fetch(FORM_ENDPOINT, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'fetch' } })
+      getTurnstileToken(vehForm).then(function (tok) {
+        fd.append('_cft', tok);
+        return fetch(FORM_ENDPOINT, { method: 'POST', body: fd, credentials: 'same-origin', headers: { 'X-Requested-With': 'fetch' } });
+      })
         .then(function (r) { return r.text().then(function (t) { var j = {}; try { j = JSON.parse(t); } catch (e) {} return j; }); })
         .then(function (j) {
           setLoading(btn, false);

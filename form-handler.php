@@ -26,12 +26,16 @@ const STORE_DIR   = __DIR__ . '/_submissions';
 const MAX_PER_10MIN = 6;                        // per-IP rate limit
 
 // ─────────────────────────────────────────────────────────────────────────────
+require_once __DIR__ . '/lib/otp.php';   // OTP proof, Turnstile, rate-limit + client-IP helpers
+
 header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
 
-function fail($msg, $code = 400) {
+function fail($msg, $code = 400, $errCode = null) {
     http_response_code($code);
-    echo json_encode(['ok' => false, 'error' => $msg]);
+    $body = ['ok' => false, 'error' => $msg];
+    if ($errCode) $body['code'] = $errCode;      // e.g. 'otp_required' — lets the page re-open OTP
+    echo json_encode($body);
     exit;
 }
 function done() {
@@ -43,15 +47,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     fail('Method not allowed.', 405);
 }
 
-// Same-origin guard (best-effort; static hosts still send Origin/Referer)
-$host = $_SERVER['HTTP_HOST'] ?? '';
-foreach (['HTTP_ORIGIN', 'HTTP_REFERER'] as $h) {
-    if (!empty($_SERVER[$h])) {
-        $p = parse_url($_SERVER[$h], PHP_URL_HOST);
-        if ($p && $host && stripos($p, $host) === false && stripos($host, $p) === false) {
-            fail('Bad origin.', 403);
-        }
-    }
+// Same-origin guard: browsers always send Origin (or Referer) on a form POST,
+// so a request carrying neither — or one from another site — is a script.
+if (!btw_same_origin()) {
+    fail('Bad origin.', 403);
 }
 
 // ── Form registry: type => [label, required fields] ─────────────────────────
@@ -82,21 +81,30 @@ $EMAIL_COPY = [
 $type = isset($_POST['_form']) ? preg_replace('/[^a-z\-]/', '', $_POST['_form']) : '';
 if (!isset($FORMS[$type])) fail('Unknown form.');
 [$label, $required] = $FORMS[$type];
+if (!btw_ready()) {
+    fail('Our form service is temporarily unavailable. Please call or WhatsApp us on 90043 83987.', 503);
+}
 
 // ── Anti-spam ──────────────────────────────────────────────────────────────
 if (!empty($_POST['_hp'])) done();                       // honeypot filled → silently accept & drop
 $ts = isset($_POST['_ts']) ? (int) $_POST['_ts'] : 0;    // ms since epoch, set by JS on page load
+if (!$ts) {
+    fail('Please reload the page and try again.', 422);      // scripts that skip the page never send it
+}
 $ageMs = (int) round(microtime(true) * 1000) - $ts;
-if ($ts && $ageMs > 6 * 60 * 60 * 1000) {
+if ($ageMs > 6 * 60 * 60 * 1000) {
     fail('This page has been open too long — please reload and try again.', 422);
 }
-if ($ts && $ageMs < 1200) {
+if ($ageMs < 1200) {
     fail('That was too quick — please try again.', 422);
 }
 
 // Rate limit (per IP, file-based)
-$ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-$ip = trim(explode(',', $ip)[0]);
+$ip = btw_client_ip();      // Cloudflare-aware and not spoofable (see lib/otp.php)
+[$burstOk] = btw_rl_hit('form-burst', $ip, 30, 600);    // every attempt counts, valid or not
+if (!$burstOk) {
+    fail('Too many requests from this connection. Please try again in a few minutes.', 429);
+}
 @mkdir(STORE_DIR, 0775, true);
 $rlFile = STORE_DIR . '/.rate-' . md5($ip) . '.json';
 $now = time();
@@ -119,7 +127,7 @@ function header_safe($v) { return str_replace(["\r", "\n", "%0a", "%0d"], ' ', $
 
 $data = [];
 foreach ($_POST as $k => $v) {
-    if ($k[0] === '_') continue;                         // skip meta fields
+    if ($k[0] === '_' || $k === 'cf-turnstile-response') continue;   // skip meta fields (and Turnstile's auto-added input)
     $data[$k] = clean($v);
 }
 
@@ -138,6 +146,25 @@ if (!empty($data['email']) && !filter_var($data['email'], FILTER_VALIDATE_EMAIL)
 }
 if ($errors) fail(implode(' ', array_unique($errors)), 422);
 
+// ── Bot protection: Turnstile + verified e-mail ────────────────────────────
+// Turnstile (careers, quick-quote, vehicle-lookup) — plus an hourly cap.
+if (in_array($type, TURNSTILE_FORMS, true)) {
+    [$hourOk] = btw_rl_hit('form-hour-' . $type, $ip, 20, 3600);
+    if (!$hourOk) fail('Too many submissions from this connection. Please try again later.', 429);
+    if (!btw_turnstile_verify((string) ($_POST['_cft'] ?? ''), $ip)) {
+        fail('Security check failed. Please refresh the page and try again.', 403);
+    }
+}
+// E-mail OTP (contact, careers, product-quote, claim, renewal): the visitor must
+// hold a valid single-use proof that THIS session verified THIS e-mail for THIS form.
+$otpForm  = in_array($type, OTP_FORMS, true);
+$otpSid   = $otpForm ? btw_sid(false) : null;
+$otpTok   = (string) ($_POST['_otp_token'] ?? '');
+$otpEmail = btw_norm_email($data['email'] ?? '');
+if ($otpForm && !($otpSid && $otpEmail !== '' && btw_proof_check($otpSid, $otpTok, $otpEmail, $type))) {
+    fail('Please verify your email address with the OTP before submitting.', 403, 'otp_required');
+}
+
 // ── Optional résumé upload (careers) ───────────────────────────────────────
 $storedFile = '';
 if ($type === 'careers' && !empty($_FILES['resume']['name']) && is_uploaded_file($_FILES['resume']['tmp_name'])) {
@@ -152,6 +179,18 @@ if ($type === 'careers' && !empty($_FILES['resume']['name']) && is_uploaded_file
     if (!move_uploaded_file($f['tmp_name'], $dir . '/' . $storedFile)) $storedFile = '(upload failed)';
 }
 
+// ── Duplicate-submission guard ───────────────────────────────────────────────
+// Same form + same details within 10 minutes → answer "ok" but do nothing (a
+// double-click or a replayed request must not create a second lead).
+if (btw_dup_seen(hash('sha256', $type . '|' . json_encode($data)), 600)) {
+    done();
+}
+
+// Burn the OTP proof NOW (single use). From here on the lead is accepted.
+if ($otpForm && !btw_proof_consume($otpSid, $otpTok, $otpEmail, $type)) {
+    fail('Please verify your email address with the OTP before submitting.', 403, 'otp_required');
+}
+
 // ── Persist (this is the "stored" guarantee — independent of email) ─────────
 $record = [
     'ts'      => date('c'),
@@ -162,6 +201,7 @@ $record = [
     'page'    => header_safe(mb_substr($_POST['_page'] ?? '', 0, 300)),
     'fields'  => $data,
     'file'    => $storedFile,
+    'email_verified' => $otpForm,      // true = e-mail confirmed by OTP
 ];
 $logOk = @file_put_contents(
     STORE_DIR . '/' . date('Y-m') . '.log.jsonl',
