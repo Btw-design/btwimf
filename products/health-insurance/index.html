@@ -36,32 +36,177 @@
 <link rel="stylesheet" href="../../assets/css/fonts.css">
 <link rel="stylesheet" href="../../assets/css/style.css?v=20260921">
 <style>
-/* Health-insurance page only (not shared style.css — no effect on other pages):
-   scroll affordance for the horizontally-scrolling on-page nav and comparison
-   table, plus a touch-scroll hint, since both can overflow on narrow screens. */
-.toc .container,.cmp-wrap{box-shadow:inset -18px 0 14px -14px rgba(16,23,52,.1)}
-.cmp-wrap{-webkit-overflow-scrolling:touch}
-.cmp-table{min-width:640px}
+/* ==========================================================================
+   Health Insurance page — full custom redesign
+   Scoped to this file only (embedded <style>, not shared style.css), so
+   every rule below — even ones that look generic — affects ONLY this page.
+   ========================================================================== */
+
+/* ---------- Hero: centred copy + overlapping stat bar (was a split grid) ---------- */
+#top .product-hero .container{max-width:860px;text-align:center;position:relative;z-index:2}
+#top .product-hero .crumb{justify-content:center}
+#top .product-hero .eyebrow-light{
+  display:inline-flex;align-items:center;gap:8px;background:rgba(123,191,167,.14);
+  border:1px solid rgba(123,191,167,.35);color:var(--accent);padding:8px 18px;
+  border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+}
+#top .product-hero .eyebrow-light::before{display:none}
+#top .product-hero h1{margin:20px auto 18px;max-width:700px}
+#top .product-hero .answer-box{max-width:660px;margin:0 auto 8px;text-align:left}
+#top .product-hero .prod-tags{justify-content:center;margin-top:22px}
+#top .product-hero .hero-ctas{justify-content:center;margin-top:28px!important}
+#top .product-hero .phero-card{display:none}
+#top .product-hero .phero-grid{display:block}
+
+.hi-statbar{
+  position:relative;z-index:3;max-width:960px;margin:44px auto 0;background:#fff;
+  border-radius:var(--r-lg);box-shadow:var(--shadow-lg);
+  display:grid;grid-template-columns:repeat(4,1fr);
+}
+.hi-statbar div{padding:26px 16px;text-align:center;border-left:1px solid var(--line)}
+.hi-statbar div:first-child{border-left:none}
+.hi-statbar b{display:block;font-family:var(--font-d);font-size:clamp(21px,2.4vw,28px);color:var(--ink);font-weight:800}
+.hi-statbar span{display:block;margin-top:4px;font-size:12px;color:var(--slate);font-weight:500;line-height:1.4}
+#overview{padding-top:0}
+@media (max-width:760px){
+  .hi-statbar{grid-template-columns:repeat(2,1fr);margin:30px auto 0}
+  .hi-statbar div{border-left:none;border-top:1px solid var(--line)}
+  .hi-statbar div:nth-child(-n+2){border-top:none}
+  #overview{padding-top:clamp(56px,9vw,80px)}
+}
+
+/* ---------- Overview: two-column explainer + navy "why us" panel ---------- */
+.hi-overview-grid{display:grid;grid-template-columns:1.3fr .9fr;gap:44px;align-items:start;margin-top:40px}
+.hi-facts{margin-top:26px;background:var(--canvas);border-radius:var(--r-md);padding:24px 26px}
+.hi-facts h3{font-family:var(--font-d);font-size:13.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent-700);margin-bottom:14px}
+.hi-facts ul{display:grid;gap:12px;padding:0;margin:0;list-style:none}
+.hi-facts li{position:relative;padding-left:20px;font-size:14.5px;line-height:1.6;color:var(--slate)}
+.hi-facts li::before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px #fff}
+.hi-facts b{color:var(--ink)}
+.hi-why{
+  background:linear-gradient(165deg,var(--navy-950),var(--primary));border-radius:var(--r-lg);
+  padding:32px 30px;color:#fff;position:sticky;top:100px;
+}
+.hi-why h2{color:#fff;font-size:19px;margin-bottom:6px}
+.hi-why>p{color:#AEBBDD;font-size:13.5px;margin-bottom:20px}
+.hi-why ul{display:grid;gap:14px;padding:0;margin:0 0 22px;list-style:none}
+.hi-why li{display:flex;align-items:flex-start;gap:10px;font-size:13.6px;color:#DCE4F6;line-height:1.55}
+.hi-why li svg{width:17px;height:17px;flex:none;margin-top:2px;stroke:var(--accent);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.hi-why .btn{width:100%}
+.hi-why-fine{margin-top:14px;font-size:11px;color:#8394BE;text-align:center}
+@media (max-width:960px){.hi-overview-grid{grid-template-columns:1fr}.hi-why{position:static}}
+
+/* ---------- Coverage: segmented toggle (CSS-only, no JS) replaces the static 2-col grid ---------- */
+.hi-toggle{max-width:820px;margin:0 auto}
+.hi-toggle input{position:absolute;opacity:0;width:0;height:0}
+.hi-toggle-tabs{display:flex;gap:8px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px;margin-bottom:26px}
+.hi-toggle-tabs label{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;
+  border-radius:99px;font-size:14px;font-weight:700;color:var(--slate);cursor:pointer;
+  transition:background .25s,color .25s;user-select:none;
+}
+.hi-toggle-tabs label svg{width:16px;height:16px;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.hi-toggle-tabs label[for=cov-yes] svg{stroke:var(--accent-700)}
+.hi-toggle-tabs label[for=cov-no] svg{stroke:#C0392B}
+#cov-yes:checked ~ .hi-toggle-tabs label[for=cov-yes]{background:var(--accent);color:#12204A}
+#cov-yes:checked ~ .hi-toggle-tabs label[for=cov-yes] svg{stroke:#12204A}
+#cov-no:checked ~ .hi-toggle-tabs label[for=cov-no]{background:#E5484D;color:#fff}
+#cov-no:checked ~ .hi-toggle-tabs label[for=cov-no] svg{stroke:#fff}
+#cov-yes:focus-visible ~ .hi-toggle-tabs label[for=cov-yes],
+#cov-no:focus-visible ~ .hi-toggle-tabs label[for=cov-no]{outline:2px solid var(--accent-700);outline-offset:2px}
+.hi-toggle-panel{display:none;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:30px 32px}
+.hi-toggle-panel ul{display:grid;gap:13px;padding:0;margin:0;list-style:none}
+.hi-toggle-panel li{position:relative;padding-left:20px;font-size:14.5px;line-height:1.6;color:var(--slate)}
+.hi-toggle-panel li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--slate-light)}
+#cov-yes:checked ~ .hi-toggle-panels .panel-yes{display:block}
+#cov-no:checked ~ .hi-toggle-panels .panel-no{display:block}
+@media (max-width:640px){.hi-toggle-tabs label span{display:none}.hi-toggle-tabs label::after{content:attr(data-short)}.hi-toggle-panel{padding:24px 20px}}
+
+/* ---------- Plans: numbered row-list + dark-header comparison table (was a card grid) ---------- */
+.hi-plan-list{border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:40px}
+.hi-plan-row{display:flex;align-items:flex-start;gap:22px;padding:26px 28px;border-bottom:1px solid var(--line);transition:background .25s}
+.hi-plan-row:last-child{border-bottom:none}
+.hi-plan-row:hover{background:var(--canvas)}
+.hi-plan-num{font-family:var(--font-d);font-size:13.5px;font-weight:800;color:var(--slate-light);flex:none;width:26px;padding-top:12px}
+.hi-plan-ico{flex:none;width:48px;height:48px;border-radius:14px;background:var(--accent-050);border:1px solid #D9EBE2;display:grid;place-items:center}
+.hi-plan-ico svg{width:22px;height:22px;fill:none;stroke:var(--accent-700);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.hi-plan-body h3{font-size:17.5px;margin-bottom:6px}
+.hi-plan-body p{font-size:14.5px;line-height:1.6;color:var(--slate);margin-bottom:12px;max-width:640px}
+.hi-plan-tags{display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:0;list-style:none}
+.hi-plan-tags li{font-size:12px;font-weight:600;color:var(--accent-700);background:var(--accent-050);border:1px solid #D9EBE2;padding:5px 12px;border-radius:99px}
+@media (max-width:640px){.hi-plan-row{gap:14px;padding:20px}.hi-plan-num{display:none}.hi-plan-body p{max-width:none}}
+
+.cmp-wrap{border-radius:var(--r-lg);border:1px solid var(--line);-webkit-overflow-scrolling:touch}
+.cmp-table{min-width:640px;width:100%;border-collapse:collapse}
+.cmp-table thead th{background:var(--navy-950);color:#fff;font-family:var(--font-d);font-weight:700;font-size:13px;letter-spacing:.02em;text-align:left;padding:16px 20px}
+.cmp-table tbody td{padding:16px 20px;font-size:14px;color:var(--slate);border-bottom:1px solid var(--line)}
+.cmp-table tbody tr:last-child td{border-bottom:none}
+.cmp-table tbody tr:nth-child(even){background:var(--canvas)}
+.cmp-table tbody td:first-child{font-weight:700;color:var(--ink)}
 .cmp-hint{display:none;font-size:12px;color:var(--slate);text-align:right;font-style:italic;margin:8px 2px 0}
 @media (max-width:900px){.cmp-hint{display:block}}
 
-/* Plan-type icon badge (matches the site's existing .why-ico visual language) */
-.plan-card{padding-top:24px}
-.plan-ico{
-  width:44px;height:44px;border-radius:13px;background:var(--accent-050);
-  border:1px solid #D9EBE2;display:grid;place-items:center;margin-bottom:14px;
+/* ---------- How to choose: connected vertical timeline (was a boxed list) ---------- */
+.hi-timeline{max-width:820px;margin:0 auto;background:#fff;border-radius:var(--r-lg);border:1px solid var(--line);padding:clamp(30px,4vw,44px) clamp(24px,4vw,46px)}
+.hi-timeline h2{margin-bottom:34px;font-size:clamp(21px,2.4vw,25px)}
+.hi-tl-list{position:relative}
+.hi-tl-list::before{content:"";position:absolute;left:19px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.hi-tl-item{position:relative;display:flex;align-items:flex-start;gap:22px;padding-bottom:32px}
+.hi-tl-item:last-child{padding-bottom:0}
+.hi-tl-num{position:relative;z-index:1;flex:none;width:40px;height:40px;border-radius:50%;background:var(--accent);color:#12204A;font-family:var(--font-d);font-weight:800;font-size:16px;display:grid;place-items:center}
+.hi-tl-item div{padding-top:7px}
+.hi-tl-item b{display:block;color:var(--ink);font-size:16px;margin-bottom:5px}
+.hi-tl-item p{font-size:14.5px;line-height:1.65;color:var(--slate);margin:0}
+
+/* ---------- Cost: two insight cards (was a prose block + list card) ---------- */
+.hi-insights{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.hi-insight-card{background:var(--canvas);border-radius:var(--r-lg);padding:32px 30px}
+.hi-insight-card.hi-insight-alt{background:var(--accent-050)}
+.hi-insight-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-700);margin-bottom:10px}
+.hi-insight-card h2{font-size:20px;margin-bottom:14px}
+.hi-insight-card>p{font-size:14.5px;line-height:1.7;color:var(--slate)}
+.hi-chip-list{display:flex;flex-direction:column;gap:10px;padding:0;margin:0;list-style:none}
+.hi-chip-list li{background:#fff;border:1px solid #D9EBE2;border-radius:12px;padding:11px 16px;font-size:13.6px;color:var(--slate)}
+@media (max-width:820px){.hi-insights{grid-template-columns:1fr}}
+
+/* ---------- Process: connected horizontal steps (replaces the plain step-card grid,
+   reused for both "How to buy" and "Claims" so the two sections read as one system) ---------- */
+.hi-process{display:grid;grid-template-columns:repeat(4,1fr);position:relative}
+.hi-process::before{content:"";position:absolute;top:20px;left:12.5%;right:12.5%;height:2px;background:var(--line);z-index:0}
+.hi-proc-step{position:relative;z-index:1;padding:0 16px;text-align:center}
+.hi-proc-num{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid var(--accent);color:var(--accent-700);font-family:var(--font-d);font-weight:800;margin:0 auto 18px}
+.hi-proc-step h3{font-size:15.5px;margin-bottom:8px}
+.hi-proc-step p{font-size:13.5px;line-height:1.6;color:var(--slate);margin:0}
+@media (max-width:860px){
+  .hi-process{grid-template-columns:1fr;gap:26px}
+  .hi-process::before{display:none}
+  .hi-proc-step{text-align:left;display:flex;align-items:flex-start;gap:16px;padding:0}
+  .hi-proc-num{margin:0;flex-shrink:0}
 }
-.plan-ico svg{width:21px;height:21px;fill:none;stroke:var(--accent-700);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
-/* Tint the covered / excluded cards so the split reads at a glance */
-.cover-yes{background:linear-gradient(180deg,var(--accent-050),#fff 140px);border-color:#D9EBE2}
-.cover-no{background:linear-gradient(180deg,#FCEFEE,#fff 140px);border-color:#F3D6D3}
+/* ---------- Riders: thin-divider two-column list (was an icon-card grid) ---------- */
+.hi-riders{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+.hi-rider{background:#fff;display:flex;align-items:flex-start;gap:16px;padding:26px 28px}
+.hi-rider-ico{flex:none;width:40px;height:40px;border-radius:11px;background:var(--accent-050);border:1px solid #D9EBE2;display:grid;place-items:center}
+.hi-rider-ico svg{width:19px;height:19px;fill:none;stroke:var(--accent-700);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.hi-rider h3{font-size:15.5px;margin-bottom:5px}
+.hi-rider p{font-size:13.5px;line-height:1.6;color:var(--slate);margin:0}
+@media (max-width:760px){.hi-riders{grid-template-columns:1fr}}
 
-/* A slightly richer bullet for the "In short" / "What affects your premium" lists */
-.keyfacts li::before{width:8px;height:8px;box-shadow:0 0 0 3px var(--accent-050)}
-
-/* Give the riders grid a touch more breathing room above its cards */
-.riders-sec .why-grid{margin-top:8px}
+/* ---------- Quote: split card (navy trust panel + form), was a single centred card ---------- */
+.hi-quote-card{max-width:1020px;margin:0 auto;display:grid;grid-template-columns:.85fr 1.15fr;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-lg)}
+.hi-quote-side{background:linear-gradient(165deg,var(--navy-950),var(--primary));color:#fff;padding:40px 36px}
+.hi-quote-side h2{color:#fff;font-size:21px;margin-bottom:10px}
+.hi-quote-side>p{color:#AEBBDD;font-size:13.8px;margin-bottom:24px}
+.hi-quote-side ul{display:grid;gap:13px;padding:0;margin:0 0 30px;list-style:none}
+.hi-quote-side li{display:flex;align-items:flex-start;gap:10px;font-size:13.6px;color:#DCE4F6}
+.hi-quote-side li svg{width:16px;height:16px;flex:none;margin-top:2px;stroke:var(--accent);fill:none;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.hi-quote-contact{display:flex;flex-direction:column;gap:10px}
+.hi-quote-contact a{font-size:13.5px;font-weight:700;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:11px 14px;text-align:center;transition:background .2s}
+.hi-quote-contact a:hover{background:rgba(255,255,255,.16)}
+.hi-quote-form{background:#fff;padding:40px 36px}
+.hi-quote-form>p{font-size:13.5px;color:var(--slate);margin-bottom:20px}
+@media (max-width:820px){.hi-quote-card{grid-template-columns:1fr}}
 </style>
 <script type="application/ld+json">
 {
@@ -386,18 +531,12 @@
           <a class="btn btn-outline-light btn-lg" href="tel:+912245260380">Talk to an Advisor</a>
         </div>
       </div>
-      <aside class="phero-card rv" aria-label="Why buy through BTW IMF">
-        <h2>Why buy through BTW IMF</h2>
-        <p>An IRDAI-licensed advisor, not a single insurer.</p>
-        <ul>
-          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>We compare health insurance across 15+ insurers and explain the trade-offs in plain language</li>
-          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>Advice is always free — you pay the same premium as buying direct</li>
-          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>A dedicated manager handles your renewals, endorsements and claims</li>
-          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>Free home or office consultation across Mumbai &amp; Pune</li>
-        </ul>
-        <a class="btn btn-accent" href="#quote">Request a Call Back</a>
-        <p class="pc-fine">Licence IMF07490120240649 &middot; AMFI ARN-282372</p>
-      </aside>
+    </div>
+    <div class="hi-statbar rv" aria-label="BTW IMF at a glance">
+      <div><b>15+</b><span>insurer partners compared</span></div>
+      <div><b>10,000+</b><span>families served</span></div>
+      <div><b>100%</b><span>claim-support commitment</span></div>
+      <div><b>2</b><span>cities — Mumbai &amp; Pune</span></div>
     </div>
   </div>
 </section>
@@ -421,16 +560,29 @@
       <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>IRDAI Licence IMF07490120240649</span>
       <span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Last updated 30 September 2026</span>
     </p>
-    <div class="keyfacts rv">
-      <h2>In short</h2>
-      <ul><li><b>What it does:</b> reimburses or directly settles hospital bills up to your sum insured.</li><li><b>Typical sum insured:</b> ₹5 lakh–₹1 crore for individuals and families.</li><li><b>Waiting periods:</b> ~30 days initial, 2–4 years for pre-existing diseases, 9 months–4 years for specific illnesses and maternity.</li><li><b>Tax:</b> premiums qualify for deduction under Section 80D of the Income Tax Act.</li><li><b>Best bought:</b> young and healthy, when premiums are lowest and waiting periods start early.</li></ul>
+    <div class="hi-overview-grid">
+      <div class="hi-overview-main rv">
+        <h2>What is Health Insurance in India?</h2>
+        <p>Health insurance is a contract between you and an insurer: you pay a yearly premium, and the insurer pays for covered medical treatment up to an agreed limit called the sum insured. Most claims today are <em>cashless</em> — the hospital bills the insurer directly at a network hospital, so you don't pay upfront.</p>
+        <p>In India, health plans are regulated by the IRDAI. They can be bought for an individual, as a family floater (one shared sum insured for the whole family), or as a group plan through an employer. BTW IMF is an IRDAI-licensed Insurance Marketing Firm, which means we can advise on and place policies from multiple insurers rather than sell just one brand.</p>
+        <div class="hi-facts">
+          <h3>In short</h3>
+          <ul><li><b>What it does:</b> reimburses or directly settles hospital bills up to your sum insured.</li><li><b>Typical sum insured:</b> ₹5 lakh–₹1 crore for individuals and families.</li><li><b>Waiting periods:</b> ~30 days initial, 2–4 years for pre-existing diseases, 9 months–4 years for specific illnesses and maternity.</li><li><b>Tax:</b> premiums qualify for deduction under Section 80D of the Income Tax Act.</li><li><b>Best bought:</b> young and healthy, when premiums are lowest and waiting periods start early.</li></ul>
+        </div>
+      </div>
+      <aside class="hi-why rv" aria-label="Why buy through BTW IMF">
+        <h2>Why buy through BTW IMF</h2>
+        <p>An IRDAI-licensed advisor, not a single insurer.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>We compare health insurance across 15+ insurers and explain the trade-offs in plain language</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>Advice is always free — you pay the same premium as buying direct</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>A dedicated manager handles your renewals, endorsements and claims</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>Free home or office consultation across Mumbai &amp; Pune</li>
+        </ul>
+        <a class="btn btn-accent" href="#quote">Request a Call Back</a>
+        <p class="hi-why-fine">Licence IMF07490120240649 &middot; AMFI ARN-282372</p>
+      </aside>
     </div>
-    <div class="prose rv" style="margin-top:34px">
-      <h2>What is Health Insurance in India?</h2>
-      <p>Health insurance is a contract between you and an insurer: you pay a yearly premium, and the insurer pays for covered medical treatment up to an agreed limit called the sum insured. Most claims today are <em>cashless</em> — the hospital bills the insurer directly at a network hospital, so you don't pay upfront.</p><p>In India, health plans are regulated by the IRDAI. They can be bought for an individual, as a family floater (one shared sum insured for the whole family), or as a group plan through an employer. BTW IMF is an IRDAI-licensed Insurance Marketing Firm, which means we can advise on and place policies from multiple insurers rather than sell just one brand.</p>
-      
-    </div>
-    <div class="pstats rv"><div><b>15+</b><span>insurer partners compared</span></div><div><b>10,000+</b><span>families served</span></div><div><b>100%</b><span>claim-support commitment</span></div><div><b>2</b><span>cities — Mumbai &amp; Pune</span></div></div>
   </div>
 </section>
 
@@ -439,16 +591,22 @@
     <header class="sec-head center">
       <span class="eyebrow rv">Coverage</span>
       <h2 class="rv">What health insurance covers &mdash; and what it doesn&rsquo;t</h2>
-      <p class="lead rv">A quick side-by-side so you know exactly where the policy helps.</p>
+      <p class="lead rv">Switch between the two to see exactly where the policy helps.</p>
     </header>
-    <div class="cover-grid">
-      <div class="cover-col cover-yes rv">
-        <h3><span class="ci"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg></span>Typically covered</h3>
-        <ul><li>In-patient hospitalisation (room, ICU, doctor and surgeon fees, medicines)</li><li>Pre-hospitalisation (typically 30–60 days) and post-hospitalisation (60–90 days) expenses</li><li>Day-care procedures that don't need 24-hour admission (e.g. cataract, dialysis)</li><li>Ambulance charges up to a specified limit</li><li>Annual preventive health check-up</li><li>AYUSH (Ayurveda, Yoga, Unani, Siddha, Homeopathy) treatment at recognised hospitals</li><li>Modern treatments and, on many plans, mental-health hospitalisation</li></ul>
+    <div class="hi-toggle rv" role="group" aria-label="Coverage view">
+      <input type="radio" name="covview" id="cov-yes" checked>
+      <input type="radio" name="covview" id="cov-no">
+      <div class="hi-toggle-tabs">
+        <label for="cov-yes" data-short="Covered"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg><span>Typically covered</span></label>
+        <label for="cov-no" data-short="Excluded"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Usually excluded</span></label>
       </div>
-      <div class="cover-col cover-no rv">
-        <h3><span class="ci"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></span>Usually excluded</h3>
-        <ul><li>Pre-existing diseases during the waiting period (usually the first 2–4 years)</li><li>Cosmetic or aesthetic procedures unless medically necessary</li><li>OPD, dental and vision unless a rider is added</li><li>Treatment for self-inflicted injury or substance abuse</li><li>Non-medical / consumable items unless a 'consumables' cover is added</li><li>Hospitalisation purely for evaluation, rest cure or rehabilitation</li><li>Claims arising from non-disclosure or wrong information in the proposal</li></ul>
+      <div class="hi-toggle-panels">
+        <div class="hi-toggle-panel panel-yes">
+          <ul><li>In-patient hospitalisation (room, ICU, doctor and surgeon fees, medicines)</li><li>Pre-hospitalisation (typically 30–60 days) and post-hospitalisation (60–90 days) expenses</li><li>Day-care procedures that don't need 24-hour admission (e.g. cataract, dialysis)</li><li>Ambulance charges up to a specified limit</li><li>Annual preventive health check-up</li><li>AYUSH (Ayurveda, Yoga, Unani, Siddha, Homeopathy) treatment at recognised hospitals</li><li>Modern treatments and, on many plans, mental-health hospitalisation</li></ul>
+        </div>
+        <div class="hi-toggle-panel panel-no">
+          <ul><li>Pre-existing diseases during the waiting period (usually the first 2–4 years)</li><li>Cosmetic or aesthetic procedures unless medically necessary</li><li>OPD, dental and vision unless a rider is added</li><li>Treatment for self-inflicted injury or substance abuse</li><li>Non-medical / consumable items unless a 'consumables' cover is added</li><li>Hospitalisation purely for evaluation, rest cure or rehabilitation</li><li>Claims arising from non-disclosure or wrong information in the proposal</li></ul>
+        </div>
       </div>
     </div>
     <p class="roles-note rv">Exact inclusions and exclusions vary by insurer and plan &mdash; your BTW IMF advisor walks you through the wording before you buy.</p>
@@ -462,8 +620,14 @@
       <h2 class="rv">Types of health insurance</h2>
       <p class="lead rv">The five common structures and who each one suits best.</p>
     </header>
-    <div class="plan-grid"><article class="plan-card rv"><span class="plan-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></span><h3>Individual plan</h3><p>A separate sum insured for one person. Best for single earners or anyone who wants their own dedicated cover.</p><ul><li>Own sum insured</li><li>Premium based on your age</li><li>No sharing with family</li></ul></article><article class="plan-card rv"><span class="plan-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="2.8"/><circle cx="16" cy="8" r="2.8"/><path d="M3 19c0-3.3 2.2-5.5 5-5.5s5 2.2 5 5.5M11 19c0-3.3 2.2-5.5 5-5.5s5 2.2 5 5.5"/></svg></span><h3>Family floater</h3><p>One shared sum insured for the whole family. Usually the most cost-effective way to cover a young family.</p><ul><li>Covers spouse, children, parents</li><li>Lower combined premium</li><li>One renewal to track</li></ul></article><article class="plan-card rv"><span class="plan-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.6-3 7.7-7 9-4-1.3-7-4.4-7-9V6z"/><path d="M9.2 12.5l1.8 1.8 3.8-4"/></svg></span><h3>Senior citizen plan</h3><p>Designed for members above 60, with cover for age-related conditions and shorter waiting periods on some plans.</p><ul><li>Higher entry age</li><li>Pre-existing cover sooner on some plans</li><li>Co-payment may apply</li></ul></article><article class="plan-card rv"><span class="plan-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg></span><h3>Top-up / super top-up</h3><p>A low-cost plan that sits above a deductible — ideal for boosting a base or employer policy affordably.</p><ul><li>Large cover at low premium</li><li>Kicks in above a threshold</li><li>Pairs with a base plan</li></ul></article><article class="plan-card rv"><span class="plan-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span><h3>Critical illness plan</h3><p>Pays a lump sum on diagnosis of a listed illness such as cancer or heart attack, separate from hospital bills.</p><ul><li>Fixed payout</li><li>Use for any expense</li><li>Complements a regular plan</li></ul></article></div>
-    
+    <div class="hi-plan-list rv">
+      <article class="hi-plan-row"><span class="hi-plan-num">01</span><span class="hi-plan-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></span><div class="hi-plan-body"><h3>Individual plan</h3><p>A separate sum insured for one person. Best for single earners or anyone who wants their own dedicated cover.</p><ul class="hi-plan-tags"><li>Own sum insured</li><li>Premium based on your age</li><li>No sharing with family</li></ul></div></article>
+      <article class="hi-plan-row"><span class="hi-plan-num">02</span><span class="hi-plan-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="2.8"/><circle cx="16" cy="8" r="2.8"/><path d="M3 19c0-3.3 2.2-5.5 5-5.5s5 2.2 5 5.5M11 19c0-3.3 2.2-5.5 5-5.5s5 2.2 5 5.5"/></svg></span><div class="hi-plan-body"><h3>Family floater</h3><p>One shared sum insured for the whole family. Usually the most cost-effective way to cover a young family.</p><ul class="hi-plan-tags"><li>Covers spouse, children, parents</li><li>Lower combined premium</li><li>One renewal to track</li></ul></div></article>
+      <article class="hi-plan-row"><span class="hi-plan-num">03</span><span class="hi-plan-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.6-3 7.7-7 9-4-1.3-7-4.4-7-9V6z"/><path d="M9.2 12.5l1.8 1.8 3.8-4"/></svg></span><div class="hi-plan-body"><h3>Senior citizen plan</h3><p>Designed for members above 60, with cover for age-related conditions and shorter waiting periods on some plans.</p><ul class="hi-plan-tags"><li>Higher entry age</li><li>Pre-existing cover sooner on some plans</li><li>Co-payment may apply</li></ul></div></article>
+      <article class="hi-plan-row"><span class="hi-plan-num">04</span><span class="hi-plan-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg></span><div class="hi-plan-body"><h3>Top-up / super top-up</h3><p>A low-cost plan that sits above a deductible — ideal for boosting a base or employer policy affordably.</p><ul class="hi-plan-tags"><li>Large cover at low premium</li><li>Kicks in above a threshold</li><li>Pairs with a base plan</li></ul></div></article>
+      <article class="hi-plan-row"><span class="hi-plan-num">05</span><span class="hi-plan-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span><div class="hi-plan-body"><h3>Critical illness plan</h3><p>Pays a lump sum on diagnosis of a listed illness such as cancer or heart attack, separate from hospital bills.</p><ul class="hi-plan-tags"><li>Fixed payout</li><li>Use for any expense</li><li>Complements a regular plan</li></ul></div></article>
+    </div>
+
     <div class="cmp-wrap rv">
       <table class="cmp-table">
         <thead><tr><th>Plan type</th><th>Best suited for</th><th>Typical sum insured</th></tr></thead>
@@ -482,22 +646,35 @@
 
 <section class="section" style="background:var(--canvas)" id="choose">
   <div class="container">
-    <div class="choose-box rv">
+    <div class="hi-timeline rv">
       <h2>How to choose the right health insurance</h2>
-      <ol><li><b>Match the cover to the risk.</b> Work out the worst realistic loss — a long hospital stay, a total-loss claim, an income gap — and buy enough health insurance to absorb it.</li><li><b>Compare like for like.</b> Premium is only meaningful next to the sum insured, sub-limits, waiting periods and exclusions. We line these up side by side.</li><li><b>Check the insurer, not just the plan.</b> Claim-settlement record, turnaround time and how the insurer treats disclosure disputes matter as much as price.</li><li><b>Add only the riders you'll use.</b> A few add-ons sharply improve real payouts; the rest just raise the premium.</li></ol>
+      <div class="hi-tl-list">
+        <div class="hi-tl-item"><span class="hi-tl-num">1</span><div><b>Match the cover to the risk.</b><p>Work out the worst realistic loss — a long hospital stay, a total-loss claim, an income gap — and buy enough health insurance to absorb it.</p></div></div>
+        <div class="hi-tl-item"><span class="hi-tl-num">2</span><div><b>Compare like for like.</b><p>Premium is only meaningful next to the sum insured, sub-limits, waiting periods and exclusions. We line these up side by side.</p></div></div>
+        <div class="hi-tl-item"><span class="hi-tl-num">3</span><div><b>Check the insurer, not just the plan.</b><p>Claim-settlement record, turnaround time and how the insurer treats disclosure disputes matter as much as price.</p></div></div>
+        <div class="hi-tl-item"><span class="hi-tl-num">4</span><div><b>Add only the riders you'll use.</b><p>A few add-ons sharply improve real payouts; the rest just raise the premium.</p></div></div>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="section" style="background:#fff" id="cost">
   <div class="container">
-    <div class="prose center rv">
-      <h2>Who needs health insurance?</h2>
-      <p>Everyone — but especially anyone without an employer plan, families with dependent children or ageing parents, self-employed professionals, and people planning a family (maternity has a 9-month–4-year wait). Even if your employer covers you, a personal plan protects you between jobs and after retirement, when buying fresh cover is harder and costlier.</p>
-    </div>
-    <div class="keyfacts rv" style="margin:28px auto 0">
-      <h2>What affects your premium</h2>
-      <ul><li>Age of the eldest insured member — the single biggest factor</li><li>Sum insured and the city you live in (metro vs non-metro)</li><li>Family size and whether parents are included</li><li>Pre-existing conditions and lifestyle (smoking, BMI)</li><li>Add-ons chosen — room-rent waiver, consumables, OPD, maternity</li><li>Any voluntary co-payment or deductible you accept in return for a lower premium</li></ul>
+    <header class="sec-head center">
+      <span class="eyebrow rv">Cost</span>
+      <h2 class="rv">Who needs it, and what it costs</h2>
+    </header>
+    <div class="hi-insights">
+      <div class="hi-insight-card rv">
+        <span class="hi-insight-tag">Who needs it</span>
+        <h2>Who needs health insurance?</h2>
+        <p>Everyone — but especially anyone without an employer plan, families with dependent children or ageing parents, self-employed professionals, and people planning a family (maternity has a 9-month–4-year wait). Even if your employer covers you, a personal plan protects you between jobs and after retirement, when buying fresh cover is harder and costlier.</p>
+      </div>
+      <div class="hi-insight-card hi-insight-alt rv">
+        <span class="hi-insight-tag">Premium factors</span>
+        <h2>What affects your premium</h2>
+        <ul class="hi-chip-list"><li>Age of the eldest insured member — the single biggest factor</li><li>Sum insured and the city you live in (metro vs non-metro)</li><li>Family size and whether parents are included</li><li>Pre-existing conditions and lifestyle (smoking, BMI)</li><li>Add-ons chosen — room-rent waiver, consumables, OPD, maternity</li><li>Any voluntary co-payment or deductible you accept in return for a lower premium</li></ul>
+      </div>
     </div>
   </div>
 </section>
@@ -509,7 +686,12 @@
       <h2 class="rv">Get covered with BTW IMF</h2>
       <p class="lead rv">Free advice, a like-for-like comparison across 15+ insurers, and support for the life of the policy.</p>
     </header>
-    <div class="step-grid"><div class="step-card rv"><h3>Tell us your needs</h3><p>Family members, ages, city, any existing conditions and your budget — by call, WhatsApp or a home visit.</p></div><div class="step-card rv"><h3>Compare shortlisted plans</h3><p>We put 3–4 suitable plans side by side — sum insured, waiting periods, room limits, co-pay and real premium.</p></div><div class="step-card rv"><h3>Apply and complete checks</h3><p>We help with the proposal form and arrange medical tests if required. Full disclosure now prevents claim trouble later.</p></div><div class="step-card rv"><h3>Get your policy and stay supported</h3><p>Policy is issued digitally. We handle renewals, endorsements and claims for as long as you hold it.</p></div></div>
+    <div class="hi-process rv">
+      <div class="hi-proc-step"><span class="hi-proc-num">1</span><h3>Tell us your needs</h3><p>Family members, ages, city, any existing conditions and your budget — by call, WhatsApp or a home visit.</p></div>
+      <div class="hi-proc-step"><span class="hi-proc-num">2</span><h3>Compare shortlisted plans</h3><p>We put 3–4 suitable plans side by side — sum insured, waiting periods, room limits, co-pay and real premium.</p></div>
+      <div class="hi-proc-step"><span class="hi-proc-num">3</span><h3>Apply and complete checks</h3><p>We help with the proposal form and arrange medical tests if required. Full disclosure now prevents claim trouble later.</p></div>
+      <div class="hi-proc-step"><span class="hi-proc-num">4</span><h3>Get your policy and stay supported</h3><p>Policy is issued digitally. We handle renewals, endorsements and claims for as long as you hold it.</p></div>
+    </div>
   </div>
 </section>
 
@@ -520,7 +702,12 @@
       <h2 class="rv">How a health insurance claim works</h2>
       <p class="lead rv">A dedicated claim manager prepares the file and follows up with the insurer until it&rsquo;s settled.</p>
     </header>
-    <div class="step-grid"><div class="step-card rv"><h3>Intimate the claim</h3><p>Call us or the insurer's helpline before a planned admission, or within 24 hours of an emergency.</p></div><div class="step-card rv"><h3>Cashless or reimbursement</h3><p>For cashless, the network hospital's insurance desk sends the pre-authorisation. For non-network, pay and claim later.</p></div><div class="step-card rv"><h3>Submit documents</h3><p>Discharge summary, bills, reports and the claim form. Your BTW IMF claim manager checks the file before it goes in.</p></div><div class="step-card rv"><h3>Settlement</h3><p>The insurer approves and pays the hospital (cashless) or credits your account (reimbursement), usually within 7–15 days.</p></div></div>
+    <div class="hi-process rv">
+      <div class="hi-proc-step"><span class="hi-proc-num">1</span><h3>Intimate the claim</h3><p>Call us or the insurer's helpline before a planned admission, or within 24 hours of an emergency.</p></div>
+      <div class="hi-proc-step"><span class="hi-proc-num">2</span><h3>Cashless or reimbursement</h3><p>For cashless, the network hospital's insurance desk sends the pre-authorisation. For non-network, pay and claim later.</p></div>
+      <div class="hi-proc-step"><span class="hi-proc-num">3</span><h3>Submit documents</h3><p>Discharge summary, bills, reports and the claim form. Your BTW IMF claim manager checks the file before it goes in.</p></div>
+      <div class="hi-proc-step"><span class="hi-proc-num">4</span><h3>Settlement</h3><p>The insurer approves and pays the hospital (cashless) or credits your account (reimbursement), usually within 7–15 days.</p></div>
+    </div>
   </div>
 </section>
 
@@ -531,36 +718,30 @@
       <h2 class="rv">Useful add-ons &amp; riders</h2>
       <p class="lead rv">Riders widen your health insurance for a small extra premium. The ones worth considering:</p>
     </header>
-    <div class="why-grid riders-grid">
-      <article class="why-card rv">
-        <span class="why-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="7" rx="2"/><path d="M3 11V9a2 2 0 012-2h4a2 2 0 012 2v2M13 11V9a2 2 0 012-2h2a2 2 0 012 2v2"/></svg></span>
-        <h3>Room-rent waiver</h3>
-        <p>Removes the cap on your hospital room category, so a claim isn&rsquo;t reduced for choosing a higher room tier.</p>
+    <div class="hi-riders rv">
+      <article class="hi-rider">
+        <span class="hi-rider-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="7" rx="2"/><path d="M3 11V9a2 2 0 012-2h4a2 2 0 012 2v2M13 11V9a2 2 0 012-2h2a2 2 0 012 2v2"/></svg></span>
+        <div><h3>Room-rent waiver</h3><p>Removes the cap on your hospital room category, so a claim isn&rsquo;t reduced for choosing a higher room tier.</p></div>
       </article>
-      <article class="why-card rv">
-        <span class="why-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
-        <h3>Consumables cover</h3>
-        <p>Pays for gloves, syringes and similar non-medical items that a base policy often excludes.</p>
+      <article class="hi-rider">
+        <span class="hi-rider-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+        <div><h3>Consumables cover</h3><p>Pays for gloves, syringes and similar non-medical items that a base policy often excludes.</p></div>
       </article>
-      <article class="why-card rv">
-        <span class="why-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.5-9.3-8.8C1.2 9 2.6 6 5.6 5.4 7.7 5 9.8 6 12 8.3 14.2 6 16.3 5 18.4 5.4c3 .6 4.4 3.6 2.9 6.8C19 16.5 12 21 12 21z"/></svg></span>
-        <h3>Maternity &amp; newborn cover</h3>
-        <p>For planned pregnancies — buy well in advance, as it carries its own waiting period.</p>
+      <article class="hi-rider">
+        <span class="hi-rider-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.5-9.3-8.8C1.2 9 2.6 6 5.6 5.4 7.7 5 9.8 6 12 8.3 14.2 6 16.3 5 18.4 5.4c3 .6 4.4 3.6 2.9 6.8C19 16.5 12 21 12 21z"/></svg></span>
+        <div><h3>Maternity &amp; newborn cover</h3><p>For planned pregnancies — buy well in advance, as it carries its own waiting period.</p></div>
       </article>
-      <article class="why-card rv">
-        <span class="why-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.4 8.4 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></span>
-        <h3>OPD &amp; doctor consultation</h3>
-        <p>Covers clinic visits, medicines and diagnostics outside a hospital admission.</p>
+      <article class="hi-rider">
+        <span class="hi-rider-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.4 8.4 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></span>
+        <div><h3>OPD &amp; doctor consultation</h3><p>Covers clinic visits, medicines and diagnostics outside a hospital admission.</p></div>
       </article>
-      <article class="why-card rv">
-        <span class="why-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.6-3 7.7-7 9-4-1.3-7-4.4-7-9V6z"/><path d="M12 8v4M12 15h.01"/></svg></span>
-        <h3>Personal accident rider</h3>
-        <p>Pays a lump sum on accidental death or disability, on top of your health cover.</p>
+      <article class="hi-rider">
+        <span class="hi-rider-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.6-3 7.7-7 9-4-1.3-7-4.4-7-9V6z"/><path d="M12 8v4M12 15h.01"/></svg></span>
+        <div><h3>Personal accident rider</h3><p>Pays a lump sum on accidental death or disability, on top of your health cover.</p></div>
       </article>
-      <article class="why-card rv">
-        <span class="why-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v10M9.3 9.7a2.7 2.7 0 012.7-1.7c1.5 0 2.7 1 2.7 2.2 0 1.1-1.1 1.9-2.7 2.2-1.6.3-2.7 1.1-2.7 2.2 0 1.2 1.2 2.2 2.7 2.2a2.7 2.7 0 002.7-1.7"/></svg></span>
-        <h3>Hospital cash</h3>
-        <p>A fixed daily allowance for each day of admission, paid regardless of the actual bill.</p>
+      <article class="hi-rider">
+        <span class="hi-rider-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v10M9.3 9.7a2.7 2.7 0 012.7-1.7c1.5 0 2.7 1 2.7 2.2 0 1.1-1.1 1.9-2.7 2.2-1.6.3-2.7 1.1-2.7 2.2 0 1.2 1.2 2.2 2.7 2.2a2.7 2.7 0 002.7-1.7"/></svg></span>
+        <div><h3>Hospital cash</h3><p>A fixed daily allowance for each day of admission, paid regardless of the actual bill.</p></div>
       </article>
     </div>
   </div>
@@ -582,26 +763,41 @@
       <h2 class="rv">Compare health insurance with a licensed advisor</h2>
       <p class="lead rv">Share a few details and we&rsquo;ll call back with quotes matched to your needs &mdash; no pressure, no spam.</p>
     </header>
-    <div class="contact-card pcf-card rv">
-      <h2>Request a call back</h2>
-      <p>Fields marked <span aria-hidden="true">*</span> are required.</p>
-      <form class="pcf" novalidate data-product="Health Insurance in India">
-        <div class="pcf-grid">
-          <div class="field"><label for="pcf-name">Full name <span class="req" aria-hidden="true">*</span></label>
-            <input type="text" id="pcf-name" name="name" autocomplete="name" required></div>
-          <div class="field"><label for="pcf-phone">Mobile number <span class="req" aria-hidden="true">*</span></label>
-            <input type="tel" id="pcf-phone" name="phone" inputmode="tel" autocomplete="tel" maxlength="10" pattern="[0-9]{10}" required></div>
-          <div class="field full"><label for="pcf-email">Email address <span class="req" aria-hidden="true">*</span></label>
-            <input type="email" id="pcf-email" name="email" autocomplete="email" required></div>
-          <div class="field full"><label for="pcf-city">City</label>
-            <input type="text" id="pcf-city" name="city" autocomplete="address-level2" placeholder="Mumbai, Pune…"></div>
-          <div class="field full"><label for="pcf-msg">Your requirement</label>
-            <textarea id="pcf-msg" name="message" placeholder="e.g. family of 4, ₹10 lakh cover, parents aged 62"></textarea></div>
+    <div class="hi-quote-card rv">
+      <div class="hi-quote-side">
+        <h2>Why request through us</h2>
+        <p>An IRDAI-licensed advisor compares plans for you — free, with no obligation.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>Quotes from 15+ insurers, compared side by side</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>Same premium as buying direct — advice costs nothing</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>A dedicated manager for renewals and claims</li>
+        </ul>
+        <div class="hi-quote-contact">
+          <a href="tel:+912245260380">Call 022 4526 0380</a>
+          <a href="https://wa.me/919004383987" target="_blank" rel="noopener">WhatsApp us</a>
         </div>
-        <button class="btn btn-navy btn-lg" type="submit">Request My Quote
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-        <p class="form-note">By submitting, you agree that your details may be shared with insurers to service your request. Insurance is the subject matter of solicitation.</p>
-      </form>
+      </div>
+      <div class="hi-quote-form">
+        <h2>Request a call back</h2>
+        <p>Fields marked <span aria-hidden="true">*</span> are required.</p>
+        <form class="pcf" novalidate data-product="Health Insurance in India">
+          <div class="pcf-grid">
+            <div class="field"><label for="pcf-name">Full name <span class="req" aria-hidden="true">*</span></label>
+              <input type="text" id="pcf-name" name="name" autocomplete="name" required></div>
+            <div class="field"><label for="pcf-phone">Mobile number <span class="req" aria-hidden="true">*</span></label>
+              <input type="tel" id="pcf-phone" name="phone" inputmode="tel" autocomplete="tel" maxlength="10" pattern="[0-9]{10}" required></div>
+            <div class="field full"><label for="pcf-email">Email address <span class="req" aria-hidden="true">*</span></label>
+              <input type="email" id="pcf-email" name="email" autocomplete="email" required></div>
+            <div class="field full"><label for="pcf-city">City</label>
+              <input type="text" id="pcf-city" name="city" autocomplete="address-level2" placeholder="Mumbai, Pune…"></div>
+            <div class="field full"><label for="pcf-msg">Your requirement</label>
+              <textarea id="pcf-msg" name="message" placeholder="e.g. family of 4, ₹10 lakh cover, parents aged 62"></textarea></div>
+          </div>
+          <button class="btn btn-navy btn-lg" type="submit">Request My Quote
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <p class="form-note">By submitting, you agree that your details may be shared with insurers to service your request. Insurance is the subject matter of solicitation.</p>
+        </form>
+      </div>
     </div>
   </div>
 </section>
