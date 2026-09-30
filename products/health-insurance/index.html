@@ -27,7 +27,7 @@
 <meta property="og:description" content="Health insurance pays your hospital bills so a medical emergency doesn&#x27;t become a financial one. Compare cashless plans from 15+ insurers with BTW IMF, an IRDAI-licensed advisor in Mumbai &amp; Pune. Free advice and end-to-end claim support.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://btwimf.com/products/health-insurance/">
-<meta property="article:modified_time" content="2026-09-01">
+<meta property="article:modified_time" content="2026-09-30">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16.png">
@@ -35,6 +35,16 @@
 <link rel="manifest" href="/site.webmanifest">
 <link rel="stylesheet" href="../../assets/css/fonts.css">
 <link rel="stylesheet" href="../../assets/css/style.css?v=20260921">
+<style>
+/* Health-insurance page only (not shared style.css — no effect on other pages):
+   scroll affordance for the horizontally-scrolling on-page nav and comparison
+   table, plus a touch-scroll hint, since both can overflow on narrow screens. */
+.toc .container,.cmp-wrap{box-shadow:inset -18px 0 14px -14px rgba(16,23,52,.1)}
+.cmp-wrap{-webkit-overflow-scrolling:touch}
+.cmp-table{min-width:640px}
+.cmp-hint{display:none;font-size:12px;color:var(--slate);text-align:right;font-style:italic;margin:8px 2px 0}
+@media (max-width:900px){.cmp-hint{display:block}}
+</style>
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -90,7 +100,7 @@
  "description": "Health insurance pays your hospital bills so a medical emergency doesn't become a financial one. Compare cashless plans from 15+ insurers with BTW IMF, an IRDAI-licensed advisor in Mumbai & Pune. Free advice and end-to-end claim support.",
  "inLanguage": "en-IN",
  "datePublished": "2025-06-01",
- "dateModified": "2026-09-01",
+ "dateModified": "2026-09-30",
  "author": {
   "@type": "Organization",
   "name": "BTW IMF Advisory Team",
@@ -391,7 +401,7 @@
     <p class="trustline rv">
       <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.6-3 7.7-7 9-4-1.3-7-4.4-7-9V6z"/><path d="M9.2 11.8l2 2 3.8-4.3"/></svg>Written &amp; reviewed by the <b>&nbsp;BTW IMF advisory team</b></span>
       <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.5l5 5L19.5 7"/></svg>IRDAI Licence IMF07490120240649</span>
-      <span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Last updated September 2026</span>
+      <span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Last updated 30 September 2026</span>
     </p>
     <div class="keyfacts rv">
       <h2>In short</h2>
@@ -438,9 +448,16 @@
     
     <div class="cmp-wrap rv">
       <table class="cmp-table">
-        <thead><tr><th>Plan type</th><th>Best suited for</th></tr></thead>
-        <tbody><tr><td>Individual plan</td><td>Own sum insured</td></tr><tr><td>Family floater</td><td>Covers spouse, children, parents</td></tr><tr><td>Senior citizen plan</td><td>Higher entry age</td></tr><tr><td>Top-up / super top-up</td><td>Large cover at low premium</td></tr><tr><td>Critical illness plan</td><td>Fixed payout</td></tr></tbody>
+        <thead><tr><th>Plan type</th><th>Best suited for</th><th>Typical sum insured</th></tr></thead>
+        <tbody>
+          <tr><td>Individual plan</td><td>Single earners who want their own dedicated cover</td><td>₹5 lakh – ₹50 lakh</td></tr>
+          <tr><td>Family floater</td><td>Young families sharing one cover across spouse, children and parents</td><td>₹5 lakh – ₹1 crore</td></tr>
+          <tr><td>Senior citizen plan</td><td>Parents or members above 60</td><td>₹3 lakh – ₹25 lakh</td></tr>
+          <tr><td>Top-up / super top-up</td><td>Boosting an existing base or employer policy affordably</td><td>₹10 lakh – ₹1 crore (above deductible)</td></tr>
+          <tr><td>Critical illness plan</td><td>An extra lump sum on diagnosis, alongside a regular plan</td><td>₹5 lakh – ₹50 lakh (lump sum)</td></tr>
+        </tbody>
       </table>
+      <p class="cmp-hint" aria-hidden="true">Swipe to see sum insured →</p>
     </div>
   </div>
 </section>
